@@ -50,6 +50,8 @@ class MenuPrincipal:
 
         #---------COSAS DE LA VENTANA PRINCIPAL----------
 
+        # Icono de la ventana
+        self.ventana.iconbitmap('iconopythonchico.ico')
         # Texto de espacio
         self.etiqueta_espacio1 = tk.Label(self.ventana, text="    ", font=("Arial", 12))
         # Imagen icono python
