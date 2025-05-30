@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
-from proyecto_grafo import NodoDoble
+from PIL import Image, ImageTk
+
 
 class Operaciones:
     def __init__(self, padre):
@@ -44,8 +45,25 @@ class MenuPrincipal:
     def __init__(self):
         self.ventana = tk.Tk()
         self.ventana.title("Academia de Computación")
-        self.ventana.geometry("800x600")
+        self.ventana.geometry("800x600+600+100")
         self.crear_menu()
+
+        #---------COSAS DE LA VENTANA PRINCIPAL----------
+
+        # Texto de espacio
+        self.etiqueta_espacio1 = tk.Label(self.ventana, text="    ", font=("Arial", 12))
+        # Imagen icono python
+        self.imagen_icono = Image.open('iconopython.png')
+        self.imagen_icono = self.imagen_icono.resize((200, 200))
+        self.imagen_icono_tk = ImageTk.PhotoImage(self.imagen_icono)
+        self.label_imagen_icono = tk.Label(self.ventana, image=self.imagen_icono_tk)
+        # Texto Eduardo Ramírez
+        self.etiqueta_nombre = tk.Label(self.ventana, text="Ramírez Vásquez Eduardo", font=("Time News Roman", 23))
+        # Posiciones
+        self.etiqueta_espacio1.pack(pady = 25)
+        self.label_imagen_icono.pack(pady=30)
+        self.etiqueta_nombre.pack()
+    
 
     def crear_menu(self):
         barra_menu = tk.Menu(self.ventana)
