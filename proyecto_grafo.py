@@ -5,7 +5,8 @@ Programa: Proyecto Grafo - proyecto_grafo.py
 Autor: Ramírez Vásquez Eduardo
 Fecha de creación: 14/05/2025
 Fechas de modificación:
-- 31/05/2025 2:30 pm(v2.1: Se empezará a hacer la interfaz gráfica del proyecto)
+    - 31/05/2025 2:30 pm(v2.1: Se empezará a hacer la interfaz gráfica del proyecto)
+    - 01/06/2025 2:13 pm(v2.2: Se hace el lobby de la aplicación)
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
@@ -393,26 +394,53 @@ class VentanaPrincipal:
         self.ventanaPrincipal.title('RutaFacil')
         self.ventanaPrincipal.geometry('800x600+600+100')
         self.fondoDividido()
+    def fondoDividido(self):
+        # Tamaños de la ventana
+        alto = 600
+        ancho = 800
+        # Color crema:
+        self.colorArriba = tk.Frame(self.ventanaPrincipal, bg='#f0f0f0', width=ancho, height=alto//2)
+        self.colorArriba.pack(side='top', fill='x')
+        # Color naranja
+        self.colorAbajo = tk.Frame(self.ventanaPrincipal, bg='#fb8a49', width=ancho, height=alto//2)
+        self.colorAbajo.pack(side='bottom', fill='x')
 
         #-----------COSAS DE LA VENTANA PRINCIPAL----------
 
         # Icono de la ventana
         self.ventanaPrincipal.iconbitmap('Iconochicografo.ico')
         # Texto de espacio
-        self.etiqueta_espacio1 = tk.Label(self.ventana, text="    ", font=("Arial", 12))
+        self.etiquetaEspacio1 = tk.Label(self.colorArriba, text="    ", font=("Arial", 12))
+        self.etiquetaEspacio2 = tk.Label(self.colorArriba, text="    ", font=("Arial", 12))
+        self.etiquetaEspacio3 = tk.Label(self.colorArriba, text="    ", font=("Arial", 12))
         # Texto Titulo y Slogan de la aplicación
-        self.etiquetaTitulo = tk.Label(self.ventanaPrincipal, text="RutaFacil", font=("Century Gothic", 23))
-        self.etiquetaSlogan = tk.Label(self.ventanaPrincipal, text="¡Llega a tus destinos sin preocuparte!", font=("Century Gothic", 23))
-    def fondoDividido(self):
-        # Tamaños de la ventana
-        alto = 600
-        ancho = 800
-        # Color crema:
-        self.colorArriba = tk.Frame(self.ventanaPrincipal, bg='#fff6ef', width=ancho, height=alto//2)
-        self.colorArriba.pack(side='top', fill='x')
-        # Color naranja
-        self.colorAbajo = tk.Frame(self.ventanaPrincipal, bg='#fb8a49', width=ancho, height=alto//2)
-        self.colorAbajo.pack(side='bottom', fill='x')
+        self.etiquetaTitulo = tk.Label(self.colorArriba, text="RutaFacil", font=("Century Gothic", 45))
+        self.etiquetaSlogan = tk.Label(self.colorArriba, text="¡Llega a tus destinos sin preocuparte!", font=("Century Gothic", 18))
+        # Boton Iniciar Sesion como usuario y administrador
+        self.botonISAdmin = tk.Button(self.colorArriba, text='Iniciar Sesion como Administrador', command = IniciarSesioncomoAdministrador)
+        self.botonISUs = tk.Button(self.colorArriba, text='Iniciar Sesion como Usuario', command = IniciarSesioncomoUsuario)
+        # Posiciones
+        self.etiquetaEspacio1.pack(pady = 30)
+        self.etiquetaTitulo.pack(pady = 8)
+        self.etiquetaSlogan.pack(pady = 8)
+        self.etiquetaEspacio2.pack(pady = 3)
+        self.botonISAdmin.pack(pady = 8)
+        self.botonISUs.pack(pady = 8)
+        self.etiquetaEspacio3.pack(pady = 3)
+
+class IniciarSesioncomoAdministrador:
+    def __init__(self):
+        self.contrasena = 'Admin'
+        self.ventAdmin = tk.Tk()
+        self.ventAdmin.title('Administrador')
+        self.ventAdmin.geometry('800x600+600+100')
+        
+class IniciarSesioncomoUsuario:
+    def __init__(self):
+        self.contrasena = 'Admin'
+        self.ventUsuario = tk.Tk()
+        self.ventUsuario.title('Usuario')
+        self.ventUsuario.geometry('800x600+600+100')
 
 # 4.- ---------- Variables u objetos globales ----------
 # 5.- ---------- Bloque Principal ----------
