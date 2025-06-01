@@ -22,6 +22,7 @@ import time
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
+from tkinter import messagebox
 
 # 3.- ---------- Definición de funciones o clases ----------
 
@@ -394,6 +395,8 @@ class VentanaPrincipal:
         self.ventanaPrincipal.title('RutaFacil')
         self.ventanaPrincipal.geometry('800x600+600+100')
         self.fondoDividido()
+        # Icono de la ventana
+        self.ventanaPrincipal.iconbitmap('Iconochicografo.ico')
     def fondoDividido(self):
         # Tamaños de la ventana
         alto = 600
@@ -407,8 +410,6 @@ class VentanaPrincipal:
 
         #-----------COSAS DE LA VENTANA PRINCIPAL----------
 
-        # Icono de la ventana
-        self.ventanaPrincipal.iconbitmap('Iconochicografo.ico')
         # Texto de espacio
         self.etiquetaEspacio1 = tk.Label(self.colorArriba, text="    ", font=("Arial", 12))
         self.etiquetaEspacio2 = tk.Label(self.colorArriba, text="    ", font=("Arial", 12))
@@ -417,30 +418,140 @@ class VentanaPrincipal:
         self.etiquetaTitulo = tk.Label(self.colorArriba, text="RutaFacil", font=("Century Gothic", 45))
         self.etiquetaSlogan = tk.Label(self.colorArriba, text="¡Llega a tus destinos sin preocuparte!", font=("Century Gothic", 18))
         # Boton Iniciar Sesion como usuario y administrador
-        self.botonISAdmin = tk.Button(self.colorArriba, text='Iniciar Sesion como Administrador', command = IniciarSesioncomoAdministrador)
-        self.botonISUs = tk.Button(self.colorArriba, text='Iniciar Sesion como Usuario', command = IniciarSesioncomoUsuario)
+        self.botonISAdmin = tk.Button(
+            self.colorArriba,
+            text='Iniciar Sesión como Administrador',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=6,                   # Espacio horizontal interno
+            pady=2,                   # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",           # Cambia a manita
+            command=self.abrirAdmin
+        )
+        self.botonISUs = tk.Button(
+            self.colorArriba,
+            text='Iniciar Sesión como Usuario',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=7,                   # Espacio horizontal interno
+            pady=3,                   # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",           # Cambia a manita
+            command=lambda: IniciarSesioncomoUsuario()
+        )
         # Posiciones
-        self.etiquetaEspacio1.pack(pady = 30)
+        self.etiquetaEspacio1.pack(pady = 35)
         self.etiquetaTitulo.pack(pady = 8)
-        self.etiquetaSlogan.pack(pady = 8)
+        self.etiquetaSlogan.pack(pady = 5)
         self.etiquetaEspacio2.pack(pady = 3)
-        self.botonISAdmin.pack(pady = 8)
-        self.botonISUs.pack(pady = 8)
-        self.etiquetaEspacio3.pack(pady = 3)
+        self.botonISAdmin.pack(pady = 5)
+        self.botonISUs.pack(pady = 5)
+        self.etiquetaEspacio3.pack(pady = 1)
+    def abrirAdmin(self):
+        self.ventanaPrincipal.destroy()
+        IniciarSesioncomoAdministrador()
 
+class IniciarSesioncomoUsuario:
+    def __init__(self):
+        self.ventUs = tk.Tk()
+        self.ventUs.title('Usuario')
+        self.ventUs.geometry('800x600+600+100')
+        # Icono de la ventana
+        self.ventUs.iconbitmap('Logous.ico')
+        
 class IniciarSesioncomoAdministrador:
     def __init__(self):
         self.contrasena = 'Admin'
         self.ventAdmin = tk.Tk()
-        self.ventAdmin.title('Administrador')
+        self.ventAdmin.title('Contraseña')
         self.ventAdmin.geometry('800x600+600+100')
-        
-class IniciarSesioncomoUsuario:
-    def __init__(self):
-        self.contrasena = 'Admin'
-        self.ventUsuario = tk.Tk()
-        self.ventUsuario.title('Usuario')
-        self.ventUsuario.geometry('800x600+600+100')
+        # Icono de la ventana
+        self.ventAdmin.iconbitmap('Contrasena.ico')
+
+        #-----------COSAS DE LA VENTANA CONTRASEÑA----------
+
+        # Texto de espacio
+        self.etiquetaEspacio1 = tk.Label(self.ventAdmin, text="    ", font=("Arial", 12))
+        self.etiquetaEspacio2 = tk.Label(self.ventAdmin, text="    ", font=("Arial", 12))
+        # Texto Contraseña
+        self.etiquetaContrasena = tk.Label(self.ventAdmin, text="Ingresa la contraseña", font=("Century Gothic", 12))
+        # Entrada de la contraseña
+        self.entradaCont = tk.Entry(
+            self.ventAdmin,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black" # Color del cursor
+        )
+        # Botones Ingresar Contraseña y Regresar
+        self.botonIngresar = tk.Button(
+            self.ventAdmin,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=6,                   # Espacio horizontal interno
+            pady=2,                   # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",           # Cambia a manita
+            command=self.pruebadeContrasena
+        )
+        self.botonRegresar = tk.Button(
+            self.ventAdmin,
+            text='Regresar',
+            font=("Century Gothic", 10),
+            bg="#707380",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=6,                   # Espacio horizontal interno
+            pady=2,                   # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",           # Cambia a manita
+            command=self.regresar
+        )
+        # Posiciones
+        self.etiquetaEspacio1.pack(pady = 50)
+        self.etiquetaContrasena.pack(pady = 8)
+        self.entradaCont.pack(pady = 8)
+        self.botonIngresar.pack(pady = 8)
+        self.botonRegresar.pack(pady = 1)
+        self.etiquetaEspacio2.pack(pady = 3)
+    def pruebadeContrasena(self):
+        contrasenaIngresada = self.entradaCont.get()
+        if contrasenaIngresada == self.contrasena:
+            self.entrarControl()
+        else:
+            messagebox.showinfo('Contraseña incorrecta', 'Ingresa de nuevo')
+    def regresar(self):
+        self.ventAdmin.destroy()
+        VentanaPrincipal()
+    def entrarControl(self):
+        self.ventAdmin.destroy()
+        self.contrasenaCorrecta()
+    def contrasenaCorrecta(self):
+        self.ventControl = tk.Tk()
+        self.ventControl.title('Administrador')
+        self.ventControl.geometry('800x600+600+100')
+        # Icono de la ventana
+        self.ventControl.iconbitmap('Logoadmin.ico')
 
 # 4.- ---------- Variables u objetos globales ----------
 # 5.- ---------- Bloque Principal ----------
@@ -449,3 +560,11 @@ if __name__ == '__main__':
     aplicacionGrafo.ventana.mainloop()
     
 # 6.- ---------- Documentación y comentarios ----------
+'''
+Búsqueda de información:
+    - Chatgpt:
+        + Como modificar el boton
+        + Bold en la letra significa negritas
+        + lambda: es para los botones, para que se ejecute toda la clase al dar click al boton
+        + Es mejor usar funciones para abrir nuevas ventanas y poder utilizarlas, ya que con una funcion cierras la ventana
+'''
