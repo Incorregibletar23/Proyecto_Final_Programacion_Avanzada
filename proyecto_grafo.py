@@ -11,6 +11,7 @@ Fechas de modificación:
         - 02/06/2025 1:32 pm(v2.2: Prueba 7)
         - 02/06/2025 1:52 pm(v2.2: Prueba 8)
         - 02/06/2025 2:40 pm(v2.2: Pruebas de github finalizadas, se empezará a trabajar en conjunto ahora)
+        - 02/06/2025 2:40 pm(v2.3: Agregue las especificaciones de bordes)
 
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
@@ -626,13 +627,19 @@ Búsqueda de información:
         + Es mejor usar funciones para abrir nuevas ventanas y poder utilizarlas, ya que con una funcion cierras la ventana
         + Como modificar las etiquetas
         + En donde va el texto (posición) es con anchor, este puede ser:
-            ~ Center: al centro
+            ~ center: al centro
             ~ w: a la izquierda
             ~ e: a la cerecha
             ~ n: arriba
             ~ s: abajo
             ~ nw: arriba e izquierda
             ~ se: abajo derecha
+        + Los tipos de borde para el boton son:
+            ~ flat: sin borde
+            ~ raised: efecto 3D
+            ~ sunken: hundido
+            ~ groove: con ranura
+            ~ ridge: con relieve
          NOTA: estas posiciones son dentro de el perimetro de la etiqueta (que también se puede editar), no de la ventana.
         + Para agregar la ventana en dos partes es necesario usar tk.Frame, y en width es la anchura y height es altura en frames
         + Para hacer que el texto de la subventana de abajo se ponga hasta arriba de la etiqueta, hay que agregar anchor='n'
