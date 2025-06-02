@@ -415,7 +415,19 @@ class VentanaPrincipal:
         self.etiquetaEspacio2 = tk.Label(self.colorArriba, text="    ", font=("Arial", 12))
         self.etiquetaEspacio3 = tk.Label(self.colorArriba, text="    ", font=("Arial", 12))
         # Texto Titulo y Slogan de la aplicación
-        self.etiquetaTitulo = tk.Label(self.colorArriba, text="RutaFacil", font=("Century Gothic", 45))
+        self.etiquetaTitulo = tk.Label(
+            self.colorArriba,
+            text="RutaFacil",         # Texto que muestra la etiqueta
+            font=("Century Gothic", 45, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                         # Color del fondo de la etiqueta
+            width=30,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                    # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
         self.etiquetaSlogan = tk.Label(self.colorArriba, text="¡Llega a tus destinos sin preocuparte!", font=("Century Gothic", 18))
         # Boton Iniciar Sesion como usuario y administrador
         self.botonISAdmin = tk.Button(
@@ -552,6 +564,41 @@ class IniciarSesioncomoAdministrador:
         self.ventControl.geometry('800x600+600+100')
         # Icono de la ventana
         self.ventControl.iconbitmap('Logoadmin.ico')
+        self.fondoDivididoAdmin()
+    def fondoDivididoAdmin(self):
+        # Tamaños de la ventana
+        ancho = 800
+        # Color naranja (60px)
+        self.colorArriba = tk.Frame(self.ventControl, bg='#fb8a49', width=ancho, height=50)
+        self.colorArriba.pack(side='top', fill='x')
+
+        # Color crema (resto: 540px)
+        self.colorAbajo = tk.Frame(self.ventControl, bg='#f0f0f0', width=ancho, height=550)
+        self.colorAbajo.pack(side='bottom', fill='x')
+
+        #-----------COSAS DE LA VENTANA ADMINISTRADOR----------
+
+        # Etiqueta de espacio
+        self.etiquetaEspacio4 = tk.Label(self.colorAbajo, text="    ", font=("Arial", 12))
+        # Textos
+        self.etiquetaBienAdmin = tk.Label(
+            self.colorAbajo,
+            text="¡Bienvenido Administrador!",         # Texto que muestra la etiqueta
+            font=("Century Gothic", 35, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                         # Color del fondo de la etiqueta
+            width=30,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                    # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.etiquetaAccion = tk.Label(self.colorAbajo, text="Seleccione cualquier acción de la barra de menú", font=("Century Gothic", 12))
+        # Posiciones
+        self.etiquetaBienAdmin.pack(pady = 10)
+        self.etiquetaAccion.pack(pady = 8)
+        self.etiquetaEspacio4.pack(pady = 90)
 
 # 4.- ---------- Variables u objetos globales ----------
 # 5.- ---------- Bloque Principal ----------
@@ -567,4 +614,19 @@ Búsqueda de información:
         + Bold en la letra significa negritas
         + lambda: es para los botones, para que se ejecute toda la clase al dar click al boton
         + Es mejor usar funciones para abrir nuevas ventanas y poder utilizarlas, ya que con una funcion cierras la ventana
+        + Como modificar las etiquetas
+        + En donde va el texto (posición) es con anchor, este puede ser:
+            ~ Center: al centro
+            ~ w: a la izquierda
+            ~ e: a la cerecha
+            ~ n: arriba
+            ~ s: abajo
+            ~ nw: arriba e izquierda
+            ~ se: abajo derecha
+         NOTA: estas posiciones son dentro de el perimetro de la etiqueta (que también se puede editar), no de la ventana.
+        + Para agregar la ventana en dos partes es necesario usar tk.Frame, y en width es la anchura y height es altura en frames
+        + Para hacer que el texto de la subventana de abajo se ponga hasta arriba de la etiqueta, hay que agregar anchor='n'
+    - Código del profesor y clasroom de la materia:
+        + Esqueleto del código
+        + Menú
 '''
