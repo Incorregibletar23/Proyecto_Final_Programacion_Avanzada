@@ -10,6 +10,7 @@ Fechas de modificación:
         - 01/06/2025 2:13 pm(v2.2: Se hace el lobby de la aplicación)
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
+        - 02/06/2025 1:32 pm(v2.2: Prueba 6)
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
