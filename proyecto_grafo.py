@@ -9,6 +9,7 @@ Fechas de modificación:
         - 31/05/2025 2:30 pm(v2.1: Se empezará a hacer la interfaz gráfica del proyecto)
         - 01/06/2025 2:13 pm(v2.2: Se hace el lobby de la aplicación)
         - 02/06/2025 1:32 pm(v2.2: Prueba 7)
+        - 02/06/2025 1:52 pm(v2.2: Prueba 8)
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
         - 02/06/2025 1:32 pm(v2.2: Prueba 6)
