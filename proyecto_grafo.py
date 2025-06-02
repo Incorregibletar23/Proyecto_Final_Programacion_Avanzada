@@ -5,8 +5,11 @@ Programa: Proyecto Grafo - proyecto_grafo.py
 Autor: Ramírez Vásquez Eduardo
 Fecha de creación: 14/05/2025
 Fechas de modificación:
-    - 31/05/2025 2:30 pm(v2.1: Se empezará a hacer la interfaz gráfica del proyecto)
-    - 01/06/2025 2:13 pm(v2.2: Se hace el lobby de la aplicación)
+    Eduardo:
+        - 31/05/2025 2:30 pm(v2.1: Se empezará a hacer la interfaz gráfica del proyecto)
+        - 01/06/2025 2:13 pm(v2.2: Se hace el lobby de la aplicación)
+    Renata:
+        - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
