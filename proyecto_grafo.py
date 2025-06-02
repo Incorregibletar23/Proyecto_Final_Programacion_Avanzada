@@ -10,6 +10,8 @@ Fechas de modificación:
         - 01/06/2025 2:13 pm(v2.2: Se hace el lobby de la aplicación)
         - 02/06/2025 1:32 pm(v2.2: Prueba 7)
         - 02/06/2025 1:52 pm(v2.2: Prueba 8)
+        - 02/06/2025 2:40 pm(v2.2: Pruebas de github finalizadas, se empezará a trabajar en conjunto ahora)
+
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
         - 02/06/2025 1:32 pm(v2.2: Prueba 6)
@@ -425,13 +427,13 @@ class VentanaPrincipal:
         # Texto Titulo y Slogan de la aplicación
         self.etiquetaTitulo = tk.Label(
             self.colorArriba,
-            text="RutaFacil",         # Texto que muestra la etiqueta
+            text="RutaFacil",                   # Texto que muestra la etiqueta
             font=("Century Gothic", 45, "bold"),# Fuente, tamaño y estilo (negrita)
             fg="black",                         # Color del texto
-            bg="#f0f0f0",                         # Color del fondo de la etiqueta
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
             width=30,                           # Ancho de la etiqueta (en caracteres aprox.)
             anchor="center",                    # Posición del texto dentro de la etiqueta
-            relief="flat",                    # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
             bd=2,                               # Grosor del borde
             padx=10,                            # Espacio interno horizontal
             pady=5                              # Espacio interno vertical
@@ -446,11 +448,11 @@ class VentanaPrincipal:
             fg="black",                # Color del texto
             activebackground="#4b5572",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
-            padx=6,                   # Espacio horizontal interno
-            pady=2,                   # Espacio vertical interno
+            padx=6,                    # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
-            cursor="hand2",           # Cambia a manita
+            cursor="hand2",            # Cambia a manita
             command=self.abrirAdmin
         )
         self.botonISUs = tk.Button(
@@ -490,7 +492,7 @@ class IniciarSesioncomoUsuario:
         
 class IniciarSesioncomoAdministrador:
     def __init__(self):
-        self.contrasena = 'Admin'
+        self.contrasena = '1234'
         self.ventAdmin = tk.Tk()
         self.ventAdmin.title('Contraseña')
         self.ventAdmin.geometry('800x600+600+100')
@@ -514,7 +516,7 @@ class IniciarSesioncomoAdministrador:
             relief="groove",        # Estilo del borde
             width=30,               # Ancho en caracteres
             justify="center",       # Texto centrado
-            insertbackground="black" # Color del cursor
+            insertbackground="black"# Color del cursor
         )
         # Botones Ingresar Contraseña y Regresar
         self.botonIngresar = tk.Button(
@@ -576,11 +578,11 @@ class IniciarSesioncomoAdministrador:
     def fondoDivididoAdmin(self):
         # Tamaños de la ventana
         ancho = 800
-        # Color naranja (60px)
+        # Color naranja (50px)
         self.colorArriba = tk.Frame(self.ventControl, bg='#fb8a49', width=ancho, height=50)
         self.colorArriba.pack(side='top', fill='x')
 
-        # Color crema (resto: 540px)
+        # Color crema (resto: 550px)
         self.colorAbajo = tk.Frame(self.ventControl, bg='#f0f0f0', width=ancho, height=550)
         self.colorAbajo.pack(side='bottom', fill='x')
 
@@ -606,7 +608,7 @@ class IniciarSesioncomoAdministrador:
         # Posiciones
         self.etiquetaBienAdmin.pack(pady = 10)
         self.etiquetaAccion.pack(pady = 8)
-        self.etiquetaEspacio4.pack(pady = 90)
+        self.etiquetaEspacio4.pack(pady = 110)
 
 # 4.- ---------- Variables u objetos globales ----------
 # 5.- ---------- Bloque Principal ----------
