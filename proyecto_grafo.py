@@ -13,6 +13,7 @@ Fechas de modificación:
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
         - 02/06/2025 1:32 pm(v2.2: Prueba 6)
+        - 02/06/2025 1:55 pm(v2.2: Prueba 9)
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
