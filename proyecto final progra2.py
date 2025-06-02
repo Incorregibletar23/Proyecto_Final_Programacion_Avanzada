@@ -60,7 +60,7 @@ class MenuPrincipal:
         self.imagen_icono_tk = ImageTk.PhotoImage(self.imagen_icono)
         self.label_imagen_icono = tk.Label(self.ventana, image=self.imagen_icono_tk)
         # Texto Eduardo Ramírez
-        self.etiqueta_nombre = tk.Label(self.ventana, text="Ramírez Vásquez Eduardo", font=("Time News Roman", 23))
+        self.etiqueta_nombre = tk.Label(self.ventana, text="Ramírez Vásquez Eduardo", font=("Time New Roman", 23))
         # Posiciones
         self.etiqueta_espacio1.pack(pady = 25)
         self.label_imagen_icono.pack(pady=30)
