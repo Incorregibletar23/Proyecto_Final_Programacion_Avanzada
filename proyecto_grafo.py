@@ -12,6 +12,8 @@ Fechas de modificación:
         - 02/06/2025 1:52 pm(v2.2: Prueba 8)
         - 02/06/2025 2:40 pm(v2.2: Pruebas de github finalizadas, se empezará a trabajar en conjunto ahora)
         - 02/06/2025 2:40 pm(v2.3: Agregue las especificaciones de bordes)
+        - 02/06/2025 1:24 pm(v2.4: Empecé a hacer la interfaz gráfica de administrador)
+        - 07/06/2025 5:30 pm(v2.5: Se agregó el grafo y se hizo el botón de agregar salas)
 
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
@@ -23,13 +25,16 @@ Fechas de modificación:
 # 2.- ---------- Importación de módulos y bibliotecas ----------
 
 #           IMPORTACIONES PARA TERMINAL
-'''
+
 import os
 import networkx as nx
 import matplotlib.pyplot as plt
 import tracemalloc
 import time
-'''
+
+
+#           FIN DE IMPORTACIONES PARA TERMINAL
+
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
@@ -37,7 +42,8 @@ from tkinter import messagebox
 
 # 3.- ---------- Definición de funciones o clases ----------
 
-#           CLASES PARA USO EN LA TERMINAL
+#           CLASES PARA USO EN LA TERMINAL:
+
 '''
 class NodoDoble:
     def __init__(self, destino, peso):
@@ -92,7 +98,7 @@ class Grafo:
     def agregar_vertice(self):
         while True:
             try:
-                rango = int(input('¿Cuántos salas vas a ingresar? '))
+                rango = int(input('¿Cuántas salas vas a ingresar? '))
                 break
             except ValueError:
                 print("Por favor, ingresa un número entero.")
@@ -211,6 +217,8 @@ class Grafo:
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
         plt.title("Mapa de salas")
         plt.show()
+
+
     def menu(self):
         print()
         while True:
@@ -398,13 +406,76 @@ def menu()
 '''
 #           FIN DE LAS CLASES DE TERMINAL
 
-#           CLASES DE LOS MÉTODOS GRAFICOS
+#           CLASES DEL GRAFO
+
+class NodoDoble:
+    def __init__(self, destino, peso):
+        self.destino = destino
+        self.peso = peso
+        self.siguiente = None
+        self.anterior = None
+
+class ListaDobleEnlazada:
+    def __init__(self):
+        self.inicio = None
+    def insertarFinal(self, destino, peso):
+        nuevo_nodo = NodoDoble(destino, peso)
+        if not self.inicio:
+            self.inicio = nuevo_nodo
+            return
+        actual = self.inicio
+        while actual.siguiente:
+            actual = actual.siguiente
+        actual.siguiente = nuevo_nodo
+        nuevo_nodo.anterior = actual
+    def eliminar(self, destino):
+        actual = self.inicio
+        while actual:
+            if actual.destino == destino:
+                if actual.anterior:
+                    actual.anterior.siguiente = actual.siguiente
+                if actual.siguiente:
+                    actual.siguiente.anterior = actual.anterior
+                if actual == self.inicio:
+                    self.inicio = actual.siguiente
+                return True
+            actual = actual.siguiente
+        return False
+    def mostrar(self):
+        actual = self.inicio
+        while actual:
+            print(f"{actual.destino}--{actual.peso}--", end=" -> ")
+            actual = actual.siguiente
+        print("None")
+    def lista_de_aristas(self):
+        aristas = []
+        actual = self.inicio
+        while actual:
+            aristas.append((actual.destino, actual.peso))
+            actual = actual.siguiente
+        return aristas
+
+class Grafo:
+    def __init__(self):
+        self.grafo = {}
+    def agregarSal(self, rango, ventana):
+        for i in range(int(rango)):
+            vertice = input(f'Ingresa sala {i+1}: ')
+            if vertice in self.grafo:
+                print(f"La sala '{vertice}' ya existe.")
+                time.sleep(2.2)
+            else:
+                self.grafo[vertice] = ListaDobleEnlazada()
+                print(f"Sala '{vertice}' agregada.")
+                time.sleep(2.2)
+
+#           CLASES DE LA INTERFAZ
 
 class VentanaPrincipal:
     def __init__(self):
         self.ventanaPrincipal = tk.Tk()
         self.ventanaPrincipal.title('RutaFacil')
-        self.ventanaPrincipal.geometry('800x600+600+100')
+        self.ventanaPrincipal.geometry('800x600+300+0')
         self.fondoDividido()
         # Icono de la ventana
         self.ventanaPrincipal.iconbitmap('Iconochicografo.ico')
@@ -449,7 +520,7 @@ class VentanaPrincipal:
             fg="black",                # Color del texto
             activebackground="#4b5572",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
-            padx=6,                    # Espacio horizontal interno
+            padx=5,                    # Espacio horizontal interno
             pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
@@ -464,11 +535,11 @@ class VentanaPrincipal:
             fg="black",                # Color del texto
             activebackground="#4b5572",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
-            padx=7,                   # Espacio horizontal interno
-            pady=3,                   # Espacio vertical interno
+            padx=23,                    # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
-            cursor="hand2",           # Cambia a manita
+            cursor="hand2",            # Cambia a manita
             command=lambda: IniciarSesioncomoUsuario()
         )
         # Posiciones
@@ -487,7 +558,7 @@ class IniciarSesioncomoUsuario:
     def __init__(self):
         self.ventUs = tk.Tk()
         self.ventUs.title('Usuario')
-        self.ventUs.geometry('800x600+600+100')
+        self.ventUs.geometry('800x600+300+0')
         # Icono de la ventana
         self.ventUs.iconbitmap('Logous.ico')
         
@@ -496,7 +567,7 @@ class IniciarSesioncomoAdministrador:
         self.contrasena = '1234'
         self.ventAdmin = tk.Tk()
         self.ventAdmin.title('Contraseña')
-        self.ventAdmin.geometry('800x600+600+100')
+        self.ventAdmin.geometry('800x600+300+0')
         # Icono de la ventana
         self.ventAdmin.iconbitmap('Contrasena.ico')
 
@@ -528,26 +599,26 @@ class IniciarSesioncomoAdministrador:
             fg="black",                # Color del texto
             activebackground="#4b5572",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
-            padx=6,                   # Espacio horizontal interno
-            pady=2,                   # Espacio vertical interno
+            padx=8,                    # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
-            cursor="hand2",           # Cambia a manita
+            cursor="hand2",            # Cambia a manita
             command=self.pruebadeContrasena
         )
         self.botonRegresar = tk.Button(
             self.ventAdmin,
             text='Regresar',
             font=("Century Gothic", 10),
-            bg="#707380",              # Fondo
-            fg="black",                # Color del texto
-            activebackground="#4b5572",# Fondo al presionar
+            bg="red",                  # Fondo
+            fg="white",                # Color del texto
+            activebackground="#900303",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
-            padx=6,                   # Espacio horizontal interno
-            pady=2,                   # Espacio vertical interno
+            padx=6,                    # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
-            cursor="hand2",           # Cambia a manita
+            cursor="hand2",            # Cambia a manita
             command=self.regresar
         )
         # Posiciones
@@ -572,50 +643,299 @@ class IniciarSesioncomoAdministrador:
     def contrasenaCorrecta(self):
         self.ventControl = tk.Tk()
         self.ventControl.title('Administrador')
-        self.ventControl.geometry('800x600+600+100')
+        self.ventControl.geometry('800x600+300+0')
         # Icono de la ventana
         self.ventControl.iconbitmap('Logoadmin.ico')
-        self.fondoDivididoAdmin()
-    def fondoDivididoAdmin(self):
+        self.lineadeFondoAdmin()
+    def lineadeFondoAdmin(self):
         # Tamaños de la ventana
         ancho = 800
-        # Color naranja (50px)
-        self.colorArriba = tk.Frame(self.ventControl, bg='#fb8a49', width=ancho, height=50)
+        # Color naranja (40px)
+        self.colorArriba = tk.Frame(self.ventControl, bg='#fb8a49', width=ancho, height=40)
         self.colorArriba.pack(side='top', fill='x')
 
-        # Color crema (resto: 550px)
-        self.colorAbajo = tk.Frame(self.ventControl, bg='#f0f0f0', width=ancho, height=550)
-        self.colorAbajo.pack(side='bottom', fill='x')
+        # Color crema (resto: 560px)
+        self.colorAbajo = tk.Frame(self.ventControl, bg='#f0f0f0', width=ancho)
+        self.colorAbajo.pack(side='top', fill='both', expand = True)
+        self.divisionBeige()
+    def divisionBeige(self):
+        # Color del Menú de acciones
+        self.menu = tk.Frame(self.colorAbajo, bg='#fcc1a0', width=180, height=560)
+        self.menu.pack(side='left', fill='y', anchor = 'nw')
+        self.menu.pack_propagate(False)
+    
+        # Color de la Imagen resultado
+        self.imagen = tk.Frame(self.colorAbajo, bg='#f0f0f0', width=300, height=560)
+        self.imagen.pack(side='right', fill='both', expand = True)
 
-        #-----------COSAS DE LA VENTANA ADMINISTRADOR----------
+        #-----------COSAS DE LA SUBVENTANA ADMINISTRADOR(MENÚ)----------
+
+        self.botonAgregarSal = tk.Button(
+            self.menu,
+            text='Agregar Salas',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=15,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.agrSal
+        )
+        self.botonAgregarCam = tk.Button(
+            self.menu,
+            text='Agregar Caminos',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=6,                    # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.regresar
+        )
+        self.botonEliminarSal = tk.Button(
+            self.menu,
+            text='Eliminar Salas',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=14,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.regresar
+        )
+        self.botonEliminarCam = tk.Button(
+            self.menu,
+            text='Eliminar Caminos',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=5,                    # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.regresar
+        )
+        self.botonVerMap = tk.Button(
+            self.menu,
+            text='Mostrar Mapa',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=16,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.regresar
+        )
+        self.botonLisSal = tk.Button(
+            self.menu,
+            text='Mostrar Lista\nde Salas',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=18,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.regresar
+        )
+        self.botonMatSal = tk.Button(
+            self.menu,
+            text='Mostrar Lista\nde Adyacencia\nde las Salas',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=13,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.regresar
+        )
+        self.botonBusCam = tk.Button(
+            self.menu,
+            text='Buscar un\nCamino',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=27,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.regresar
+        )
+        self.botonReg = tk.Button(
+            self.menu,
+            text='Regresar',
+            font=("Century Gothic", 10),
+            bg="red",                  # Fondo
+            fg="white",                # Color del texto
+            activebackground="#900303",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=30,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.regresar
+        )
+        # Posiciones
+        self.botonAgregarSal.pack(pady = 10)
+        self.botonAgregarCam.pack(pady = 10)
+        self.botonEliminarSal.pack(pady = 10)
+        self.botonEliminarCam.pack(pady = 10)
+        self.botonVerMap.pack(pady = 10)
+        self.botonLisSal.pack(pady = 10)
+        self.botonMatSal.pack(pady = 10)
+        self.botonBusCam.pack(pady = 10)
+        self.botonReg.pack(pady = 10)
+
+        #-----------COSAS DE LA SUBVENTANA ADMINISTRADOR(IMAGEN)----------
 
         # Etiqueta de espacio
-        self.etiquetaEspacio4 = tk.Label(self.colorAbajo, text="    ", font=("Arial", 12))
+        self.etiquetaEspacio4 = tk.Label(self.imagen, text="    ", font=("Arial", 12))
         # Textos
         self.etiquetaBienAdmin = tk.Label(
-            self.colorAbajo,
-            text="¡Bienvenido Administrador!",         # Texto que muestra la etiqueta
-            font=("Century Gothic", 35, "bold"),# Fuente, tamaño y estilo (negrita)
+            self.imagen,
+            text="¡Bienvenido Administrador!",  # Texto que muestra la etiqueta
+            font=("Century Gothic", 30, "bold"),# Fuente, tamaño y estilo (negrita)
             fg="black",                         # Color del texto
-            bg="#f0f0f0",                         # Color del fondo de la etiqueta
-            width=30,                           # Ancho de la etiqueta (en caracteres aprox.)
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=23,                           # Ancho de la etiqueta (en caracteres aprox.)
             anchor="center",                    # Posición del texto dentro de la etiqueta
-            relief="flat",                    # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
             bd=2,                               # Grosor del borde
-            padx=10,                            # Espacio interno horizontal
+            padx=1,                             # Espacio interno horizontal
             pady=5                              # Espacio interno vertical
         )
-        self.etiquetaAccion = tk.Label(self.colorAbajo, text="Seleccione cualquier acción de la barra de menú", font=("Century Gothic", 12))
+        self.etiquetaAccion = tk.Label(self.imagen, text="Seleccione cualquier acción de la barra de menú", font=("Century Gothic", 12))
         # Posiciones
+        self.etiquetaEspacio4.pack(pady = 90)
         self.etiquetaBienAdmin.pack(pady = 10)
         self.etiquetaAccion.pack(pady = 8)
-        self.etiquetaEspacio4.pack(pady = 110)
+    def agrSal(self):
+        self.etiquetaEspacio4.destroy()
+        self.etiquetaBienAdmin.destroy()
+        self.etiquetaAccion.destroy()
+
+        #-----------MARCO DE ACCION PARA MANIPULAR EL GRAFO----------
+
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+
+        #-----------COSAS DE LA SUBVENTANA MARCOFORMULARIO----------
+
+        # Etiquetas
+        self.etiquetaCuaSal = tk.Label(
+            self.marAcc,
+            text="Escribe cuántas salas quieres agregar",  # Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=30,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=1,                             # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entradas
+        self.entradaNumSal = tk.Entry(
+            self.marAcc,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Botones
+        self.botonNumSal = tk.Button(
+            self.marAcc,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="white",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=30,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.ingNumSal
+        )
+        # Posiciones
+        self.etiquetaCuaSal.pack(pady = 10)
+        self.entradaNumSal.pack(pady=10)
+        self.botonNumSal.pack(pady=10)
+    def ingNumSal(self):
+        numSal = self.entradaNumSal.get()
+        self.etiquetaCuaSal.destroy()
+        self.entradaNumSal.destroy()
+        self.botonNumSal.destroy()
+        grafo.agregarSal(numSal, self.marAcc)
 
 # 4.- ---------- Variables u objetos globales ----------
+
+# Grafo
+grafo = Grafo()
+'''
+    for i in range(12):
+        self.grafo.grafo[str(i)] = ListaDobleEnlazada()
+    conexiones = [
+        [0, 4, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 3, 0, 0, 5, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0],
+        [2, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0],
+        [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 7],
+        [0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 3, 0, 0, 4, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ]
+    for i in range(len(conexiones)):
+        for j in range(len(conexiones[i])):
+            peso = conexiones[i][j]
+            if peso != 0:
+                self.grafo.grafo[str(i)].insertarFinal(str(j), peso)
+'''
+                
 # 5.- ---------- Bloque Principal ----------
 if __name__ == '__main__':
     aplicacionGrafo = VentanaPrincipal()
-    aplicacionGrafo.ventana.mainloop()
+    aplicacionGrafo.ventanaPrincipal.mainloop()
     
 # 6.- ---------- Documentación y comentarios ----------
 '''
@@ -624,7 +944,8 @@ Búsqueda de información:
         + Como modificar el boton
         + Bold en la letra significa negritas
         + lambda: es para los botones, para que se ejecute toda la clase al dar click al boton
-        + Es mejor usar funciones para abrir nuevas ventanas y poder utilizarlas, ya que con una funcion cierras la ventana
+        + Es mejor usar funciones para abrir nuevas ventanas y poder utilizarlas, ya que con una funcion cierras
+        la ventana
         + Como modificar las etiquetas
         + En donde va el texto (posición) es con anchor, este puede ser:
             ~ center: al centro
@@ -640,9 +961,23 @@ Búsqueda de información:
             ~ sunken: hundido
             ~ groove: con ranura
             ~ ridge: con relieve
-         NOTA: estas posiciones son dentro de el perimetro de la etiqueta (que también se puede editar), no de la ventana.
-        + Para agregar la ventana en dos partes es necesario usar tk.Frame, y en width es la anchura y height es altura en frames
-        + Para hacer que el texto de la subventana de abajo se ponga hasta arriba de la etiqueta, hay que agregar anchor='n'
+        + fill en pack controla la manera en que se expande un witget (en este caso la barra naranjarosa) en el
+        contenedor, sus opciones son:
+            ~ none: mantiene su tamaño mínimo
+            ~ x: se expande horizontalmente para llenar todo lo ancho posible
+            ~ y: se expande verticalmente para llenar todo el alto posible
+            ~ both: se expande en ambas direcciones para llenar todo el espacio posible
+        + Para agregar la ventana en dos partes es necesario usar tk.Frame, y en width es la anchura y height es
+        altura en frames
+        + Para hacer que el texto de la subventana de abajo se ponga hasta arriba de la etiqueta, hay que agre-
+        gar anchor='n'
+        + Al usar pack, esta función puede hacer que la ventana lateral del menú sea lo más estrecha posible pa-
+        ra ajustarse lo más posible a los botones
+        + Para destruir objetos, ".destroy" funciona para ventanas y etiquetas (lo usamos en la ventana de admi-
+        nistrador para que se eliminen las etiquetas de bienvenido y selecciona accion)
+        + Fue necesario hacer contenedores extra en la ventana imagen para poder manupilar facilmente esta ven-
+        tana
+        + expand=True sirve para hacer que el marco de accion rellene toda la subventana imagen
     - Código del profesor y clasroom de la materia:
         + Esqueleto del código
         + Menú
