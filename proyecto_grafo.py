@@ -21,6 +21,7 @@ Fechas de modificación:
         - 08/06/2025 2:48 pm(v2.8: Se agregó la funcion de eliminar salas al botón)
         - 08/06/2025 3:48 pm(v2.9: Se agregó la funcion de agregar caminos al botón)
         - 08/06/2025 4:41 pm(v2.10: Se agregó la funcion de eliminar caminos al botón)
+        - 08/06/2025 9:46 pm(v2.11: )
 
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
@@ -1505,10 +1506,10 @@ class IniciarSesioncomoAdministrador:
         #-----------COSAS DE LA SUBVENTANA MARCOFORMULARIO----------
 
         # Etiquetas
-        self.etiquetaCuaCam = tk.Label(
+        self.etiquetaMostrar = tk.Label(
             self.marAcc,
-            text="Escribe cuantos caminos quieres eliminar",  # Texto que muestra la etiqueta
-            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            text="Mostrar:",  # Texto que muestra la etiqueta
+            font=("Century Gothic", 30, "bold"),# Fuente, tamaño y estilo (negrita)
             fg="black",                         # Color del texto
             bg="#f0f0f0",                       # Color del fondo de la etiqueta
             width=38,                           # Ancho de la etiqueta (en caracteres aprox.)
@@ -1518,25 +1519,13 @@ class IniciarSesioncomoAdministrador:
             padx=1,                             # Espacio interno horizontal
             pady=5                              # Espacio interno vertical
         )
-        # Entradas
-        self.entradaNumCam = tk.Entry(
-            self.marAcc,
-            font=("Century Gothic", 12),
-            bg="#ffffff",           # Fondo 
-            fg="#333333",           # Texto 
-            bd=2,                   # Grosor del borde
-            relief="groove",        # Estilo del borde
-            width=30,               # Ancho en caracteres
-            justify="center",       # Texto centrado
-            insertbackground="black"# Color del cursor
-        )
         # Botones
-        self.botonNumCam = tk.Button(
+        self.botonMosSal = tk.Button(
             self.marAcc,
-            text='Ingresar',
+            text='Sala',
             font=("Century Gothic", 10),
             bg="#abaeb8",              # Fondo
-            fg="white",                # Color del texto
+            fg="black",                # Color del texto
             activebackground="#4b5572",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
             padx=30,                   # Espacio horizontal interno
@@ -1544,12 +1533,43 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.eliNumCam
+            command=self.regresar
+        )
+        self.botonMosMap = tk.Button(
+            self.marAcc,
+            text='Mapa',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=30,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.regresar
+        )
+        self.botonMosMatAdy = tk.Button(
+            self.marAcc,
+            text='Matriz de Adyacencia',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=30,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.regresar
         )
         # Posiciones
-        self.etiquetaCuaCam.pack(pady = 10)
-        self.entradaNumCam.pack(pady=10)
-        self.botonNumCam.pack(pady=10)
+        self.etiquetaMostrar.pack(pady = 10)
+        self.botonMosSal.pack(pady=10)
+        self.botonMosMap.pack(pady=10)
+        self.botonMosMatAdy.pack(pady=10)
 
 # 4.- ---------- Variables u objetos globales ----------
 
