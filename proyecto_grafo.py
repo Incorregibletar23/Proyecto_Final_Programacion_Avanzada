@@ -28,6 +28,7 @@ Fechas de modificación:
         - 02/06/2025 1:32 pm(v2.2: Prueba 6)
         - 02/06/2025 1:55 pm(v2.2: Prueba 9)
         - 02/06/2025 1:32 pm(v2.2: Prueba 10)
+        - 08/06/2025 9:48 pm(v2.3: Empece a modificar la ventana usuario)
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
@@ -977,6 +978,95 @@ class IniciarSesioncomoUsuario:
         self.ventUs.geometry('800x600+300+0')
         # Icono de la ventana
         self.ventUs.iconbitmap('Logous.ico')
+        self.divisiones_colores_ventUs()
+    # Botones de acciones para usuario --------------------------------------------------------------
+        # 
+        self.boton_camino_corto = tk.Button(
+            self.div_izq,
+            text = " Mostrar mapa  ",
+            font=("Comic Sans MS", 10),
+            bg='#99a3a4',              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#f8f9f9",# Fondo al presionar
+            activeforeground="black",  # Color del texto al presionar
+            padx=15,                    # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.comandoTemporal_1
+        )
+        
+        self.boton_camino_corto.pack(pady=50)
+        #
+        self.boton_calcular_camino = tk.Button(
+            self.div_izq,
+            text = "Calcular camino",
+            font=("Comic Sans MS", 10),
+            bg='#99a3a4',              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#f8f9f9",# Fondo al presionar
+            activeforeground="black",  # Color del texto al presionar
+            padx=16,                    # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.comandoTemporal_2
+        )
+        
+        self.boton_calcular_camino.pack(pady=50)
+
+        self.salir= tk.Button(
+            self.div_izq,
+            text = "Salir",
+            font=("Comic Sans MS", 10),
+            bg='#99a3a4',              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#f8f9f9",# Fondo al presionar
+            activeforeground="black",  # Color del texto al presionar
+            padx=17,                    # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=lambda: self.salir_ventUs()
+        )
+        
+        self.salir.pack(pady=50)
+
+    def salir_ventUs(self):
+        self.ventUs.destroy()
+        
+    def regresar(self):
+        self.ventus.destroy()
+        Ventanaprincipal()
+
+    def comandoTemporal_1(self):
+        print('funcion')
+        
+    def comandoTemporal_2(self):
+        print('funcion')
+        
+    def divisiones_colores_ventUs(self):
+        
+        # #717d7e
+        self.color_arriba = tk.Frame(self.ventUs, bg='#2c3e50', width=800, height=40)
+        self.color_arriba.pack(side='top', fill='x')
+
+        # Color crema (resto: 560px)
+        self.color_fondo= tk.Frame(self.ventUs, bg='#f4f6f7', width=800)
+        self.color_fondo.pack(side='top', fill='both', expand = True)
+        self.division_izquierda()
+
+    def division_izquierda(self):
+        
+        self.div_izq = tk.Frame(self.color_fondo, bg='#ccd1d1', width=180, height=560)
+        self.div_izq.pack(side='left', fill='y', anchor = 'nw')
+        self.div_izq.pack_propagate(False)
+    
+        self.fondo = tk.Frame(self.color_fondo, bg='#fbfcfc', width=300, height=560)
+        self.fondo.pack(side='right', fill='both', expand = True)
         
 class IniciarSesioncomoAdministrador:
     def __init__(self):
