@@ -2,7 +2,9 @@
 
 '''
 Programa: Proyecto Grafo - proyecto_grafo.py
-Autor: Ramírez Vásquez Eduardo
+Autores:
+- Ramírez Vásquez Eduardo
+- Rosas López Renata
 Fecha de creación: 14/05/2025
 Fechas de modificación:
     Eduardo:
@@ -13,7 +15,12 @@ Fechas de modificación:
         - 02/06/2025 2:40 pm(v2.2: Pruebas de github finalizadas, se empezará a trabajar en conjunto ahora)
         - 02/06/2025 2:40 pm(v2.3: Agregue las especificaciones de bordes)
         - 02/06/2025 1:24 pm(v2.4: Empecé a hacer la interfaz gráfica de administrador)
-        - 07/06/2025 5:30 pm(v2.5: Se agregó el grafo y se hizo el botón de agregar salas)
+        - 07/06/2025 5:30 pm(v2.5: Se agregó el grafo y se empezó a hacer el botón de agregar salas)
+        - 08/06/2025 1:48 pm(v2.6: Se agregó la funcion de agregar salas al botón)
+        - 08/06/2025 1:48 pm(v2.7: Se agregaron las salas iniciales al abrir el código)
+        - 08/06/2025 2:48 pm(v2.8: Se agregó la funcion de eliminar salas al botón)
+        - 08/06/2025 3:48 pm(v2.9: Se agregó la funcion de agregar caminos al botón)
+        - 08/06/2025 4:41 pm(v2.10: Se agregó la funcion de eliminar caminos al botón)
 
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
@@ -42,7 +49,7 @@ from tkinter import messagebox
 
 # 3.- ---------- Definición de funciones o clases ----------
 
-#           CLASES PARA USO EN LA TERMINAL:
+#-----------CLASES PARA USO EN LA TERMINAL:----------
 
 '''
 class NodoDoble:
@@ -404,9 +411,9 @@ def menu()
         except ValueError as e:
             print(e)
 '''
-#           FIN DE LAS CLASES DE TERMINAL
+#-----------FIN DE LAS CLASES DE TERMINAL----------
 
-#           CLASES DEL GRAFO
+#-----------CLASES DEL GRAFO----------
 
 class NodoDoble:
     def __init__(self, destino, peso):
@@ -459,17 +466,425 @@ class Grafo:
     def __init__(self):
         self.grafo = {}
     def agregarSal(self, rango, ventana):
-        for i in range(int(rango)):
-            vertice = input(f'Ingresa sala {i+1}: ')
-            if vertice in self.grafo:
-                print(f"La sala '{vertice}' ya existe.")
-                time.sleep(2.2)
+        # Establecer rango y ventana para poder ser usados durante las funciones
+        self.rango = int(rango)
+        self.ventana = ventana
+        # Contador
+        self.contador = 0
+        # Cosas de agregar salas (Para poder agregar salas y que se creen y destruyan los objetos)
+        self.objetos = []
+        self.accAgrSalSal()
+    def accAgrSalSal(self):
+        #          ROMPER EL BUCLE
+        if self.contador >= self.rango:
+            messagebox.showinfo('Completado', f'Se han agregado TODAS las salas correctamente')
+            return
+            # NOTA: el return no retorna nada, ya que solo sirve para terminar el bucle
+        # Eliminar los objetos de la sala que se está escribiendo para insertar los de la siguiente sala
+        for objeto in self.objetos:
+            objeto.destroy()
+        self.objetos.clear()
+        # Etiqueta de agregar sala
+        self.etiquetaAgrSal = tk.Label(
+            self.ventana,
+            text=f"Ingresa el nombre de la Sala {self.contador + 1}",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=30,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entrada de nombre de sala
+        self.entradaNomSal = tk.Entry(
+            self.ventana,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Boton ingresar el nombre de la sala
+        self.botonNomSal = tk.Button(
+            self.ventana,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=23,                   # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=lambda: self.ingNomSal(self.entradaNomSal)
+        )
+        # Posiciones
+        self.etiquetaAgrSal.pack(pady=10)
+        self.entradaNomSal.pack(pady=10)
+        self.botonNomSal.pack(pady=10)
+        # Colocar cada objeto en la lista objetos
+        self.objetos.append(self.etiquetaAgrSal)
+        self.objetos.append(self.entradaNomSal)
+        self.objetos.append(self.botonNomSal)
+    def ingNomSal(self, entradaSala):
+        sala = str(entradaSala.get())
+        if sala in self.grafo:
+            messagebox.showinfo('Sala existente', f'La sala {sala} ya existe')
+        else:
+            self.grafo[sala] = ListaDobleEnlazada()
+            messagebox.showinfo('Sala Ingresada', f'La sala {sala} se insertó correctamente')
+            self.contador += 1
+            # Volver a ejecutar acción agregar sala por sala:
+            self.accAgrSalSal()
+    def eliminarSal(self, rango, ventana):
+        # Establecer rango y ventana para poder ser usados durante las funciones
+        self.rango = int(rango)
+        self.ventana = ventana
+        # Contador
+        self.contador = 0
+        # Cosas de eliminar salas (Para poder eliminar salas y que se creen y destruyan los objetos)
+        self.objetos = []
+        self.accEliSalSal()
+    def accEliSalSal(self):
+        #          ROMPER EL BUCLE
+        if self.contador >= self.rango:
+            messagebox.showinfo('Completado', f'Se han eliminado TODAS las salas correctamente')
+            return
+            # NOTA: el return no retorna nada, ya que solo sirve para terminar el bucle
+        # Eliminar los objetos de la sala que se está escribiendo para insertar los de la siguiente sala
+        for objeto in self.objetos:
+            objeto.destroy()
+        self.objetos.clear()
+        # Etiqueta de eliminar sala
+        self.etiquetaEliSal = tk.Label(
+            self.ventana,
+            text=f"Ingresa el nombre de la Sala {self.contador + 1} a eliminar",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=30,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entrada de nombre de sala
+        self.entradaNomSal = tk.Entry(
+            self.ventana,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Boton ingresar el nombre de la sala
+        self.botonNomSal = tk.Button(
+            self.ventana,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=23,                   # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=lambda: self.eliIngNomSal(self.entradaNomSal)
+        )
+        # Posiciones
+        self.etiquetaEliSal.pack(pady=10)
+        self.entradaNomSal.pack(pady=10)
+        self.botonNomSal.pack(pady=10)
+        # Colocar cada objeto en la lista objetos
+        self.objetos.append(self.etiquetaEliSal)
+        self.objetos.append(self.entradaNomSal)
+        self.objetos.append(self.botonNomSal)
+    def eliIngNomSal(self, entradaSala):
+        sala = str(entradaSala.get())
+        if sala not in self.grafo:
+            messagebox.showinfo('Sala inexistente', f'¡La sala {sala} NO existe!, quizas escribiste mal')
+            self.contador += 1
+            # Volver a ejecutar acción agregar sala por sala:
+            self.accEliSalSal()
+        else:
+            del self.grafo[sala]
+            for lista in self.grafo.values():
+                lista.eliminar(sala)
+            messagebox.showinfo('Sala Eliminada', f'La sala {sala}, {self.contador + 1} se eliminó correctamente')
+            self.contador += 1
+            # Volver a ejecutar acción agregar sala por sala:
+            self.accEliSalSal()
+    def agregarCam(self, rango, ventana):
+        # Establecer rango y ventana para poder ser usados durante las funciones
+        self.rango = int(rango)
+        self.ventana = ventana
+        # Contador
+        self.contador = 0
+        # Cosas de agregar caminos (para poder agregar caminos y que se creen y destruyan los objetos)
+        self.objetos = []
+        self.accAgrCam()
+    def accAgrCam(self):
+        #          ROMPER EL BUCLE
+        if self.contador >= self.rango:
+            messagebox.showinfo('Completado', f'Se han agregado TODOS los caminos correctamente')
+            return
+            # NOTA: el return no retorna nada, ya que solo sirve para terminar el bucle
+        # Eliminar los objetos del camino que esta escribiendo para insertar los del nuevo camino
+        for objeto in self.objetos:
+            objeto.destroy()
+        self.objetos.clear()
+        # Etiqueta de agregar camino
+        self.etiquetaAgrCamOri = tk.Label(
+            self.ventana,
+            text=f"Ingresa el nombre de la sala de Origen del camino {self.contador + 1}",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.etiquetaAgrCamDes = tk.Label(
+            self.ventana,
+            text=f"Ingresa el nombre de la sala de Destino del camino {self.contador + 1}",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.etiquetaAgrDisCam = tk.Label(
+            self.ventana,
+            text=f"Ingresa la distancia {self.contador + 1} entre los caminos",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=0,                            # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entrada de nombre de sala
+        self.entradaNomCamOri = tk.Entry(
+            self.ventana,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        self.entradaNomCamDes = tk.Entry(
+            self.ventana,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        self.entradaDisCam = tk.Entry(
+            self.ventana,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Boton ingresar el camino
+        self.botonNomCam = tk.Button(
+            self.ventana,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=23,                   # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=lambda: self.ingNomCam(self.entradaNomCamOri, self.entradaNomCamDes, self.entradaDisCam)
+        )
+        # Posiciones
+        self.etiquetaAgrCamOri.pack(pady=10)
+        self.entradaNomCamOri.pack(pady=10)
+        self.etiquetaAgrCamDes.pack(pady=10)
+        self.entradaNomCamDes.pack(pady=10)
+        self.etiquetaAgrDisCam.pack(pady=10)
+        self.entradaDisCam.pack(pady=10)
+        self.botonNomCam.pack(pady=10)
+        # Colocar cada objeto en la lista objetos
+        self.objetos.append(self.etiquetaAgrCamOri)
+        self.objetos.append(self.entradaNomCamOri)
+        self.objetos.append(self.etiquetaAgrCamDes)
+        self.objetos.append(self.entradaNomCamDes)
+        self.objetos.append(self.etiquetaAgrDisCam)
+        self.objetos.append(self.entradaDisCam)
+        self.objetos.append(self.botonNomCam)
+    def ingNomCam(self, salaOrigen, salaDestino, Distancia):
+        Origen = str(salaOrigen.get())
+        Destino = str(salaDestino.get())
+        Dist = int(Distancia.get())
+        if Origen not in self.grafo:
+            messagebox.showinfo('Sala inexistente', f'¡La sala {Origen} NO existe!, quizas escribiste mal')
+            return
+        if Destino not in self.grafo:
+            messagebox.showinfo('Sala inexistente', f'¡La sala {Destino} NO existe!, quizas escribiste mal')
+            return
+        else:
+            self.grafo[Origen].insertarFinal(Destino, Dist)
+            self.contador += 1
+            messagebox.showinfo('Ingresado Correctamente', f'El camino de {Origen} a {Destino} con {Dist}m se ingresó correctamente')
+            # Volver a ejecutar acción agregar sala por sala:
+            self.accAgrCam()
+    def eliminarCam(self, rango, ventana):
+        # Establecer rango y ventana para poder ser usados durante las funciones
+        self.rango = int(rango)
+        self.ventana = ventana
+        # Contador
+        self.contador = 0
+        # Cosas de eliminar caminos (para poder eliminar caminos y que se creen y destruyan los objetos)
+        self.objetos = []
+        self.accEliCam()
+    def accEliCam(self):
+        #          ROMPER EL BUCLE
+        if self.contador >= self.rango:
+            messagebox.showinfo('Completado', f'Se han eliminado TODOS los caminos correctamente')
+            return
+            # NOTA: el return no retorna nada, ya que solo sirve para terminar el bucle
+        # Eliminar los objetos del camino que esta escribiendo para insertar los de la nueva accion
+        for objeto in self.objetos:
+            objeto.destroy()
+        self.objetos.clear()
+        # Etiqueta de eliminar camino
+        self.etiquetaEliCamOri = tk.Label(
+            self.ventana,
+            text=f"Ingresa el nombre de la sala de Origen del camino\na eliminar numero {self.contador + 1}",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.etiquetaEliCamDes = tk.Label(
+            self.ventana,
+            text=f"Ingresa el nombre de la sala de Destino del camino\na eliminar numero {self.contador + 1}",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entrada de nombre de sala
+        self.entradaNomCamOri = tk.Entry(
+            self.ventana,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        self.entradaNomCamDes = tk.Entry(
+            self.ventana,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Boton ingresar el camino
+        self.botonNomCam = tk.Button(
+            self.ventana,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=23,                   # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=lambda: self.eliIngNomCam(self.entradaNomCamOri, self.entradaNomCamDes)
+        )
+        # Posiciones
+        self.etiquetaEliCamOri.pack(pady=10)
+        self.entradaNomCamOri.pack(pady=10)
+        self.etiquetaEliCamDes.pack(pady=10)
+        self.entradaNomCamDes.pack(pady=10)
+        self.botonNomCam.pack(pady=10)
+        # Colocar cada objeto en la lista objetos
+        self.objetos.append(self.etiquetaEliCamOri)
+        self.objetos.append(self.entradaNomCamOri)
+        self.objetos.append(self.etiquetaEliCamDes)
+        self.objetos.append(self.entradaNomCamDes)
+        self.objetos.append(self.botonNomCam)
+    def eliIngNomCam(self, salaOrigen, salaDestino):
+        Origen = str(salaOrigen.get())
+        Destino = str(salaDestino.get())
+        if Origen not in self.grafo:
+            messagebox.showinfo('Sala inexistente', f'¡La sala {Origen} NO existe!, quizas escribiste mal')
+            return
+        if Destino not in self.grafo:
+            messagebox.showinfo('Sala inexistente', f'¡La sala {Destino} NO existe!, quizas escribiste mal')
+            return
+        else:
+            eliminacion = self.grafo[Origen].eliminar(Destino)
+            if not eliminacion:
+                messagebox.showinfo('Camino inexistente', f'¡El camino de {Origen} a {Destino} NO existe!\nquizas escribiste mal')
+                return
             else:
-                self.grafo[vertice] = ListaDobleEnlazada()
-                print(f"Sala '{vertice}' agregada.")
-                time.sleep(2.2)
-
-#           CLASES DE LA INTERFAZ
+                messagebox.showinfo('Eliminado Correctamente', f'El camino de {Origen} a {Destino} se eliminó correctamente')
+                self.contador += 1
+                self.accEliCam()
+#-----------CLASES DE LA INTERFAZ----------
 
 class VentanaPrincipal:
     def __init__(self):
@@ -669,7 +1084,22 @@ class IniciarSesioncomoAdministrador:
         self.imagen.pack(side='right', fill='both', expand = True)
 
         #-----------COSAS DE LA SUBVENTANA ADMINISTRADOR(MENÚ)----------
-
+        
+        # Etiqueta Espacio
+        self.etiquetaEspacio7 = tk.Label(
+            self.menu,
+            text="   ",  # Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#fcc1a0",                       # Color del fondo de la etiqueta
+            width=8,                            # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=1,                             # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Botones
         self.botonAgregarSal = tk.Button(
             self.menu,
             text='Agregar Salas',
@@ -698,7 +1128,7 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.regresar
+            command=self.agrCam
         )
         self.botonEliminarSal = tk.Button(
             self.menu,
@@ -713,7 +1143,7 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.regresar
+            command=self.eliSal
         )
         self.botonEliminarCam = tk.Button(
             self.menu,
@@ -728,62 +1158,32 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.regresar
+            command=self.eliCam
         )
-        self.botonVerMap = tk.Button(
+        self.botonMostrar = tk.Button(
             self.menu,
-            text='Mostrar Mapa',
+            text='Mostrar',
             font=("Century Gothic", 10),
             bg="#abaeb8",              # Fondo
             fg="black",                # Color del texto
             activebackground="#4b5572",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
-            padx=16,                   # Espacio horizontal interno
+            padx=34,                   # Espacio horizontal interno
             pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.regresar
+            command=self.mostrar
         )
-        self.botonLisSal = tk.Button(
+        self.botonBuscar = tk.Button(
             self.menu,
-            text='Mostrar Lista\nde Salas',
+            text='Buscar',
             font=("Century Gothic", 10),
             bg="#abaeb8",              # Fondo
             fg="black",                # Color del texto
             activebackground="#4b5572",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
-            padx=18,                   # Espacio horizontal interno
-            pady=2,                    # Espacio vertical interno
-            relief="raised",           # Estilo de borde
-            bd=3,                      # Grosor del borde
-            cursor="hand2",            # Cambia a manita
-            command=self.regresar
-        )
-        self.botonMatSal = tk.Button(
-            self.menu,
-            text='Mostrar Lista\nde Adyacencia\nde las Salas',
-            font=("Century Gothic", 10),
-            bg="#abaeb8",              # Fondo
-            fg="black",                # Color del texto
-            activebackground="#4b5572",# Fondo al presionar
-            activeforeground="white",  # Color del texto al presionar
-            padx=13,                   # Espacio horizontal interno
-            pady=2,                    # Espacio vertical interno
-            relief="raised",           # Estilo de borde
-            bd=3,                      # Grosor del borde
-            cursor="hand2",            # Cambia a manita
-            command=self.regresar
-        )
-        self.botonBusCam = tk.Button(
-            self.menu,
-            text='Buscar un\nCamino',
-            font=("Century Gothic", 10),
-            bg="#abaeb8",              # Fondo
-            fg="black",                # Color del texto
-            activebackground="#4b5572",# Fondo al presionar
-            activeforeground="white",  # Color del texto al presionar
-            padx=27,                   # Espacio horizontal interno
+            padx=36,                   # Espacio horizontal interno
             pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
@@ -806,14 +1206,13 @@ class IniciarSesioncomoAdministrador:
             command=self.regresar
         )
         # Posiciones
+        self.etiquetaEspacio7.pack(pady = 26)
         self.botonAgregarSal.pack(pady = 10)
         self.botonAgregarCam.pack(pady = 10)
         self.botonEliminarSal.pack(pady = 10)
         self.botonEliminarCam.pack(pady = 10)
-        self.botonVerMap.pack(pady = 10)
-        self.botonLisSal.pack(pady = 10)
-        self.botonMatSal.pack(pady = 10)
-        self.botonBusCam.pack(pady = 10)
+        self.botonMostrar.pack(pady = 10)
+        self.botonBuscar.pack(pady = 10)
         self.botonReg.pack(pady = 10)
 
         #-----------COSAS DE LA SUBVENTANA ADMINISTRADOR(IMAGEN)----------
@@ -839,10 +1238,16 @@ class IniciarSesioncomoAdministrador:
         self.etiquetaEspacio4.pack(pady = 90)
         self.etiquetaBienAdmin.pack(pady = 10)
         self.etiquetaAccion.pack(pady = 8)
+    def limpiarImagen(self):
+        if hasattr(self, 'etiquetaEspacio4'):
+            self.etiquetaEspacio4.destroy()
+            self.etiquetaBienAdmin.destroy()
+            self.etiquetaAccion.destroy()
+        if hasattr(self, 'marAcc'):
+            self.marAcc.destroy()
+            del self.marAcc
     def agrSal(self):
-        self.etiquetaEspacio4.destroy()
-        self.etiquetaBienAdmin.destroy()
-        self.etiquetaAccion.destroy()
+        self.limpiarImagen()
 
         #-----------MARCO DE ACCION PARA MANIPULAR EL GRAFO----------
 
@@ -903,35 +1308,279 @@ class IniciarSesioncomoAdministrador:
         self.entradaNumSal.destroy()
         self.botonNumSal.destroy()
         grafo.agregarSal(numSal, self.marAcc)
+    def eliSal(self):
+        self.limpiarImagen()
+
+        #-----------MARCO DE ACCION PARA MANIPULAR EL GRAFO----------
+
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+
+        #-----------COSAS DE LA SUBVENTANA MARCOFORMULARIO----------
+
+        # Etiquetas
+        self.etiquetaCuaSal = tk.Label(
+            self.marAcc,
+            text="Escribe cuántas salas quieres eliminar",  # Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=30,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=1,                             # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entradas
+        self.entradaNumSal = tk.Entry(
+            self.marAcc,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Botones
+        self.botonNumSal = tk.Button(
+            self.marAcc,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="white",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=30,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.eliIngNumSal
+        )
+        # Posiciones
+        self.etiquetaCuaSal.pack(pady = 10)
+        self.entradaNumSal.pack(pady=10)
+        self.botonNumSal.pack(pady=10)
+    def eliIngNumSal(self):
+        numSal = self.entradaNumSal.get()
+        self.etiquetaCuaSal.destroy()
+        self.entradaNumSal.destroy()
+        self.botonNumSal.destroy()
+        grafo.eliminarSal(numSal, self.marAcc)
+    def agrCam(self):
+        self.limpiarImagen()
+
+        #-----------MARCO DE ACCION PARA MANIPULAR EL GRAFO----------
+
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+
+        #-----------COSAS DE LA SUBVENTANA MARCOFORMULARIO----------
+
+        # Etiquetas
+        self.etiquetaCuaCam = tk.Label(
+            self.marAcc,
+            text="Escribe cuantos caminos quieres agregar",  # Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=38,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=1,                             # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entradas
+        self.entradaNumCam = tk.Entry(
+            self.marAcc,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Botones
+        self.botonNumCam = tk.Button(
+            self.marAcc,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="white",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=30,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.agrNumCam
+        )
+        # Posiciones
+        self.etiquetaCuaCam.pack(pady = 10)
+        self.entradaNumCam.pack(pady=10)
+        self.botonNumCam.pack(pady=10)
+    def agrNumCam(self):
+        numCam = self.entradaNumCam.get()
+        self.etiquetaCuaCam.destroy()
+        self.entradaNumCam.destroy()
+        self.botonNumCam.destroy()
+        grafo.agregarCam(numCam, self.marAcc)
+    def eliCam(self):
+        self.limpiarImagen()
+
+        #-----------MARCO DE ACCION PARA MANIPULAR EL GRAFO----------
+
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+
+        #-----------COSAS DE LA SUBVENTANA MARCOFORMULARIO----------
+
+        # Etiquetas
+        self.etiquetaCuaCam = tk.Label(
+            self.marAcc,
+            text="Escribe cuantos caminos quieres eliminar",  # Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=38,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=1,                             # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entradas
+        self.entradaNumCam = tk.Entry(
+            self.marAcc,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Botones
+        self.botonNumCam = tk.Button(
+            self.marAcc,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="white",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=30,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.eliNumCam
+        )
+        # Posiciones
+        self.etiquetaCuaCam.pack(pady = 10)
+        self.entradaNumCam.pack(pady=10)
+        self.botonNumCam.pack(pady=10)
+    def eliNumCam(self):
+        numCam = self.entradaNumCam.get()
+        self.etiquetaCuaCam.destroy()
+        self.entradaNumCam.destroy()
+        self.botonNumCam.destroy()
+        grafo.eliminarCam(numCam, self.marAcc)
+    def mostrar(self):
+        self.limpiarImagen()
+        
+        #-----------MARCO DE ACCION PARA MANIPULAR EL GRAFO----------
+
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+
+        #-----------COSAS DE LA SUBVENTANA MARCOFORMULARIO----------
+
+        # Etiquetas
+        self.etiquetaCuaCam = tk.Label(
+            self.marAcc,
+            text="Escribe cuantos caminos quieres eliminar",  # Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=38,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=1,                             # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entradas
+        self.entradaNumCam = tk.Entry(
+            self.marAcc,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Botones
+        self.botonNumCam = tk.Button(
+            self.marAcc,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="white",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=30,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.eliNumCam
+        )
+        # Posiciones
+        self.etiquetaCuaCam.pack(pady = 10)
+        self.entradaNumCam.pack(pady=10)
+        self.botonNumCam.pack(pady=10)
 
 # 4.- ---------- Variables u objetos globales ----------
 
 # Grafo
 grafo = Grafo()
-'''
-    for i in range(12):
-        self.grafo.grafo[str(i)] = ListaDobleEnlazada()
-    conexiones = [
-        [0, 4, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 3, 0, 0, 5, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0],
-        [2, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0],
-        [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 1, 0],
-        [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 7],
-        [0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 3, 0, 0, 4, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ]
-    for i in range(len(conexiones)):
-        for j in range(len(conexiones[i])):
-            peso = conexiones[i][j]
-            if peso != 0:
-                self.grafo.grafo[str(i)].insertarFinal(str(j), peso)
-'''
-                
+#-----------Agregar las salas iniciales al empezar el código----------
+salasIniciales = ['Arte Prehispánico', 'Arte Contemporáneo', 'Escultura', 'Pintura Europea', 'Fotografía', 'Arte Moderno', 'Arte Oriental', 'Arte Popular Mexicano', 'Historia Natural', 'Virreinato', 'Revolución', 'Ciencias y Tecnología']
+for sala in salasIniciales:
+    grafo.grafo[sala] = ListaDobleEnlazada()
+conexiones = [
+    [0, 4, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 3, 0, 0, 5, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0],
+    [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 7],
+    [0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 3, 0, 0, 4, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+]
+for conexion in range(len(conexiones)):
+    for conexionj in range(len(conexiones[conexion])):
+        distancia = conexiones[conexion][conexionj]
+        if distancia != 0:
+            origen = salasIniciales[conexion]
+            destino = salasIniciales[conexionj]
+            grafo.grafo[origen].insertarFinal(destino, distancia)
+
 # 5.- ---------- Bloque Principal ----------
 if __name__ == '__main__':
     aplicacionGrafo = VentanaPrincipal()
@@ -978,6 +1627,11 @@ Búsqueda de información:
         + Fue necesario hacer contenedores extra en la ventana imagen para poder manupilar facilmente esta ven-
         tana
         + expand=True sirve para hacer que el marco de accion rellene toda la subventana imagen
+        + En accAgrSalSal, objeto.destroy elimina los objetos de la pantalla, y self.objetos.clear() sirve para
+        eliminarlos de la lista
+        + hasattr(objeto, "atributo") sirve para ver si un objeto tiene un atributo y devuelve True, si no tiene
+        el atributo, devuelve False (en este caso el objeto es self, y el atribut es marco de acción o etiqueta
+        espacio 4)
     - Código del profesor y clasroom de la materia:
         + Esqueleto del código
         + Menú
