@@ -22,6 +22,7 @@ Fechas de modificación:
         - 08/06/2025 3:48 pm(v2.9: Se agregó la funcion de agregar caminos al botón)
         - 08/06/2025 4:41 pm(v2.10: Se agregó la funcion de eliminar caminos al botón)
         - 08/06/2025 9:46 pm(v2.11: Se hizo las funciones de  el botón de mostrar y el subbotón salas)
+        - 09/06/2025 3:07 pm(v2.12: Se hizo el mapa)
 
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
@@ -41,13 +42,13 @@ import matplotlib.pyplot as plt
 import tracemalloc
 import time
 
-
 #           FIN DE IMPORTACIONES PARA TERMINAL
 
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 from tkinter import messagebox
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # 3.- ---------- Definición de funciones o clases ----------
 
@@ -469,7 +470,7 @@ class ListaDobleEnlazada:
         texto1 = origen + '   ' 
         salas.append(texto1)
         while actual:
-            texto = '   ' + str(actual.destino) + ', distancia: ' + str(actual.peso) + '   '
+            texto = '   ' + str(actual.destino) + ', distancia: ' + str(actual.peso) + 'm' + '   '
             salas.append(texto)
             actual = actual.siguiente
         salida = '-->'.join(salas)
@@ -981,7 +982,43 @@ class Grafo:
             self.grafo[sala].mostrarNuevo(sala, self.vent)
         else:
             messagebox.showinfo('Sala inexistente', f'¡La sala {sala} NO existe!, quizas escribiste mal')
-
+    def mostrarMapa(self, ventana):
+        # Grafo
+        G = nx.DiGraph()
+        # Crear Caminos
+        for origen, lista in self.grafo.items():
+            for destino, peso in lista.lista_de_aristas():
+                G.add_edge(origen, destino, weight=peso)
+        # Figura
+        ima = plt.Figure()
+        # Tamaño
+        area = ima.add_subplot(1, 1, 1)
+        # Titulo
+        area.set_title('Mapa del Museo')
+        pos = nx.spring_layout(G)
+        # Modificar el formato de las cosas
+        nx.draw(
+            G, pos,
+            with_labels=True,
+            ax=area,
+            node_color='#b7bedb',    # Color de los nodos
+            node_shape='s',          # Nodos cuadrados
+            font_color='#212b6a',    # Color de letra nodos
+            edge_color='gray',       # Color de las aristas
+            node_size=800,           # Tamaño de los nodos
+            font_size=6              # Tamaño de letra de etiquetas
+        )
+        nx.draw_networkx_edge_labels(
+            G, pos,
+            edge_labels=nx.get_edge_attributes(G, 'weight'),
+            ax=area,
+            font_size=8                                  # Tamaño de letra de etiquetas de aristas
+        )
+            # Agregar la imagen a la ventana
+        canvas = FigureCanvasTkAgg(ima, master=ventana)
+        canvas.draw()
+        canvas.get_tk_widget().pack(expand=True, fill="both")
+    
 #-----------CLASES DE LA INTERFAZ----------
 
 class VentanaPrincipal:
@@ -1734,7 +1771,7 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.regresar
+            command=self.mosLisSal
         )
         self.botonMosMatAdy = tk.Button(
             self.marAcc,
@@ -1764,7 +1801,7 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.regresar
+            command=self.mosMap
         )
         # Posiciones
         self.etiquetaMostrar.pack(pady = 10)
@@ -1779,6 +1816,20 @@ class IniciarSesioncomoAdministrador:
         self.marAcc.pack(expand=True)
         # Funcion
         grafo.mostrarSal(self.marAcc)
+    def mosLisSal(self):
+        self.limpiarImagen()
+        # Hacer de nuevo el contenedor temporal
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+        # Funcion
+        grafo.mosLisSal(self.marAcc)
+    def mosMap(self):
+        self.limpiarImagen()
+        # Hacer de nuevo el contenedor temporal
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+        # Funcion
+        grafo.mostrarMapa(self.marAcc)
 
 # 4.- ---------- Variables u objetos globales ----------
 
@@ -1862,6 +1913,11 @@ Búsqueda de información:
         el atributo, devuelve False (en este caso el objeto es self, y el atribut es marco de acción o etiqueta
         espacio 4)
         + "separador".join(lista) sirve para combinar los elementos de una lista mas un separador
+        + plt.figure() es la imágen del mapa del grafo
+        + .add_subplot(1,1,1) es el área de donde se pone el grafo networkx
+        + Se utilizó Matplottlib porque es una función que funciona con entornos gráficos
+        + Se utiliza FigureCanvasTkAgg ya que su función es integrar la imágen de matplotlib a la interfaz de
+        tkinter
     - Código del profesor y clasroom de la materia:
         + Esqueleto del código
         + Menú
