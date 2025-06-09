@@ -21,7 +21,7 @@ Fechas de modificación:
         - 08/06/2025 2:48 pm(v2.8: Se agregó la funcion de eliminar salas al botón)
         - 08/06/2025 3:48 pm(v2.9: Se agregó la funcion de agregar caminos al botón)
         - 08/06/2025 4:41 pm(v2.10: Se agregó la funcion de eliminar caminos al botón)
-        - 08/06/2025 9:46 pm(v2.11: Se hizo las funciones de el botón de mostrar y el subbotón salas)
+        - 08/06/2025 9:46 pm(v2.11: Se hizo las funciones de  el botón de mostrar y el subbotón salas)
 
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
