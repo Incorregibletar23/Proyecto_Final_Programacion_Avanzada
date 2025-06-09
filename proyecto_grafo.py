@@ -21,7 +21,7 @@ Fechas de modificación:
         - 08/06/2025 2:48 pm(v2.8: Se agregó la funcion de eliminar salas al botón)
         - 08/06/2025 3:48 pm(v2.9: Se agregó la funcion de agregar caminos al botón)
         - 08/06/2025 4:41 pm(v2.10: Se agregó la funcion de eliminar caminos al botón)
-        - 08/06/2025 9:46 pm(v2.11: )
+        - 08/06/2025 9:46 pm(v2.11: Se hizo las funciones de el botón de mostrar y el subbotón salas)
 
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
@@ -463,6 +463,31 @@ class ListaDobleEnlazada:
             aristas.append((actual.destino, actual.peso))
             actual = actual.siguiente
         return aristas
+    def mostrarNuevo(self, origen, ventana):
+        actual = self.inicio
+        salas = []
+        texto1 = origen + '   ' 
+        salas.append(texto1)
+        while actual:
+            texto = '   ' + str(actual.destino) + ', distancia: ' + str(actual.peso) + '   '
+            salas.append(texto)
+            actual = actual.siguiente
+        salida = '-->'.join(salas)
+        
+        self.etiquetaSalSal = tk.Label(
+            ventana,
+            text=salida,                        # Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=80,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.etiquetaSalSal.pack(pady=10)
 
 class Grafo:
     def __init__(self):
@@ -886,6 +911,77 @@ class Grafo:
                 messagebox.showinfo('Eliminado Correctamente', f'El camino de {Origen} a {Destino} se eliminó correctamente')
                 self.contador += 1
                 self.accEliCam()
+    def mostrarSal(self, ventana):
+        self.vent = ventana
+        # Etiqueta de Ingresar Sala
+        self.etiquetaIngSal = tk.Label(
+            self.vent,
+            text=f"Ingresa el nombre de la sala a buscar",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entrada de Ingresar Sala
+        self.entradaIngSal = tk.Entry(
+            self.vent,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="#333333",           # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Botón Ingresar Sala
+        self.botonNomCam = tk.Button(
+            self.vent,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=23,                   # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command= self.ingMosSal
+        )
+        # Posiciones
+        self.etiquetaIngSal.pack(pady=10)
+        self.entradaIngSal.pack(pady=10)
+        self.botonNomCam.pack(pady=10)
+    def ingMosSal(self):
+        sala = self.entradaIngSal.get()
+        if sala in self.grafo:
+            # Etiqueta caminos desde
+            self.etiquetaCamDes = tk.Label(
+                self.vent,
+                text=f"Caminos desde {sala}:",# Texto que muestra la etiqueta
+                font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+                fg="black",                         # Color del texto
+                bg="#f0f0f0",                       # Color del fondo de la etiqueta
+                width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+                anchor="center",                    # Posición del texto dentro de la etiqueta
+                relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+                bd=2,                               # Grosor del borde
+                padx=10,                            # Espacio interno horizontal
+                pady=5                              # Espacio interno vertical
+            )
+            # Posiciones
+            self.etiquetaCamDes.pack(pady=10)
+            self.grafo[sala].mostrarNuevo(sala, self.vent)
+        else:
+            messagebox.showinfo('Sala inexistente', f'¡La sala {sala} NO existe!, quizas escribiste mal')
+
 #-----------CLASES DE LA INTERFAZ----------
 
 class VentanaPrincipal:
@@ -1025,7 +1121,7 @@ class IniciarSesioncomoUsuario:
             fg="black",                # Color del texto
             activebackground="#f8f9f9",# Fondo al presionar
             activeforeground="black",  # Color del texto al presionar
-            padx=17,                    # Espacio horizontal interno
+            padx=17,                   # Espacio horizontal interno
             pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
@@ -1618,22 +1714,22 @@ class IniciarSesioncomoAdministrador:
             fg="black",                # Color del texto
             activebackground="#4b5572",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
-            padx=30,                   # Espacio horizontal interno
+            padx=55,                   # Espacio horizontal interno
             pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.regresar
+            command=self.mostrarSal
         )
-        self.botonMosMap = tk.Button(
+        self.botonMosLisSal = tk.Button(
             self.marAcc,
-            text='Mapa',
+            text='Lista de Salas',
             font=("Century Gothic", 10),
             bg="#abaeb8",              # Fondo
             fg="black",                # Color del texto
             activebackground="#4b5572",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
-            padx=30,                   # Espacio horizontal interno
+            padx=27,                   # Espacio horizontal interno
             pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
@@ -1648,7 +1744,22 @@ class IniciarSesioncomoAdministrador:
             fg="black",                # Color del texto
             activebackground="#4b5572",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
-            padx=30,                   # Espacio horizontal interno
+            padx=5,                    # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.regresar
+        )
+        self.botonMosMap = tk.Button(
+            self.marAcc,
+            text='Mapa',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=52,                   # Espacio horizontal interno
             pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
@@ -1657,9 +1768,17 @@ class IniciarSesioncomoAdministrador:
         )
         # Posiciones
         self.etiquetaMostrar.pack(pady = 10)
-        self.botonMosSal.pack(pady=10)
-        self.botonMosMap.pack(pady=10)
-        self.botonMosMatAdy.pack(pady=10)
+        self.botonMosSal.pack(pady = 10)
+        self.botonMosLisSal.pack(pady = 10)
+        self.botonMosMatAdy.pack(pady = 10)
+        self.botonMosMap.pack(pady = 10)
+    def mostrarSal(self):
+        self.limpiarImagen()
+        # Hacer de nuevo el contenedor temporal
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+        # Funcion
+        grafo.mostrarSal(self.marAcc)
 
 # 4.- ---------- Variables u objetos globales ----------
 
@@ -1742,6 +1861,7 @@ Búsqueda de información:
         + hasattr(objeto, "atributo") sirve para ver si un objeto tiene un atributo y devuelve True, si no tiene
         el atributo, devuelve False (en este caso el objeto es self, y el atribut es marco de acción o etiqueta
         espacio 4)
+        + "separador".join(lista) sirve para combinar los elementos de una lista mas un separador
     - Código del profesor y clasroom de la materia:
         + Esqueleto del código
         + Menú
