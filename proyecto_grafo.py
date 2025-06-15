@@ -30,9 +30,12 @@ Fechas de modificación:
         - 02/06/2025 1:55 pm(v2.2: Prueba 9)
         - 02/06/2025 1:32 pm(v2.2: Prueba 10)
         - 08/06/2025 9:48 pm(v2.3: Empece a modificar la ventana usuario)
-        - 13/06/2025 5:06 pm(v2.4: Se modifico el subboton mostrar,lista de salas, se agregaron las funciones)
-        - 14/06/2025 4:56 pm(v2.5: Se modifico el subboton mostrar,regresar, se modifico la función)
-        - 14/06/2025 4:56 pm(v2.5: Se modifico el subboton mostrar,matriz de adyacencia, se agregaron las funciones)
+        - 13/06/2025 5:06 pm(v2.4: Se modifico el subboton mostrar,lista de salas)
+        - 13/06/2025 5:46 pm(v2.5: Se agregaron las funciones para mostrar la lista de salas)
+        - 14/06/2025 4:56 pm(v2.6: Se modifico el subboton mostrar,regresar)
+        - 14/06/2025 4:56 pm(v2.7: Se agrego la función para regresar)
+        - 14/06/2025 4:56 pm(v2.5: Se modifico el subboton mostrar,matriz de adyacencia)
+        - 14/06/2025 4:56 pm(v2.5: Se agregaron las funciones para mostrar matriz)
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
@@ -426,6 +429,7 @@ class NodoDoble:
         self.peso = peso
         self.siguiente = None
         self.anterior = None
+
 class ListaDobleEnlazada:
     def __init__(self):
         self.inicio = None
@@ -475,6 +479,7 @@ class ListaDobleEnlazada:
             salas.append(texto)
             actual = actual.siguiente
         salida = '-->'.join(salas)
+        
         self.etiquetaSalSal = tk.Label(
             ventana,
             text=salida,                        # Texto que muestra la etiqueta
@@ -498,6 +503,7 @@ class ListaDobleEnlazada:
             actual = actual.siguiente
         salida = " -- ".join(almacenar)
         return salida
+
     def listnommat(self, caso):
         match caso:
             case "imprimir":
@@ -514,6 +520,7 @@ class ListaDobleEnlazada:
                     almacenar.append((actual.destino, int(actual.peso)))
                     actual = actual.siguiente
                 return almacenar
+
 class Grafo:
     def __init__(self):
         self.grafo = {}
@@ -606,7 +613,7 @@ class Grafo:
         self.objetos = []
         self.accEliSalSal()
     def accEliSalSal(self):
-        # ROMPER EL BUCLE
+        #          ROMPER EL BUCLE
         if self.contador >= self.rango:
             messagebox.showinfo('Completado', f'Se han eliminado TODAS las salas correctamente')
             return
@@ -1949,7 +1956,7 @@ class IniciarSesioncomoAdministrador:
         self.marAcc.pack(expand=True)
         # Funcion
         grafo.most_mat_ady(self.marAcc)
-        
+
 # 4.- ---------- Variables u objetos globales ----------
 
 # Grafo
