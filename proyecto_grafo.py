@@ -30,6 +30,9 @@ Fechas de modificación:
         - 02/06/2025 1:55 pm(v2.2: Prueba 9)
         - 02/06/2025 1:32 pm(v2.2: Prueba 10)
         - 08/06/2025 9:48 pm(v2.3: Empece a modificar la ventana usuario)
+        - 13/06/2025 5:06 pm(v2.4: Se modifico el subboton mostrar,lista de salas, se agregaron las funciones)
+        - 14/06/2025 4:56 pm(v2.5: Se modifico el subboton mostrar,regresar, se modifico la función)
+        - 14/06/2025 4:56 pm(v2.5: Se modifico el subboton mostrar,matriz de adyacencia, se agregaron las funciones)
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
@@ -273,7 +276,6 @@ class Grafo:
                     raise ValueError("Opción no válida.")
             except ValueError as e:
                 print(e)
-
 class BusquedaDeCamino:
     def __init__(self, matriz, origen, destino):
         self.matriz = matriz
@@ -424,7 +426,6 @@ class NodoDoble:
         self.peso = peso
         self.siguiente = None
         self.anterior = None
-
 class ListaDobleEnlazada:
     def __init__(self):
         self.inicio = None
@@ -474,7 +475,6 @@ class ListaDobleEnlazada:
             salas.append(texto)
             actual = actual.siguiente
         salida = '-->'.join(salas)
-        
         self.etiquetaSalSal = tk.Label(
             ventana,
             text=salida,                        # Texto que muestra la etiqueta
@@ -489,7 +489,31 @@ class ListaDobleEnlazada:
             pady=5                              # Espacio interno vertical
         )
         self.etiquetaSalSal.pack(pady=10)
-
+    def mostnomnue(self):
+        actual = self.inicio
+        almacenar = []
+        while actual:
+            mostrar = str(actual.destino) + " - distancia: " + str(actual.peso) + "m"
+            almacenar.append(mostrar)
+            actual = actual.siguiente
+        salida = " -- ".join(almacenar)
+        return salida
+    def listnommat(self, caso):
+        match caso:
+            case "imprimir":
+                almacenar = []
+                actual = self.inicio
+                while actual:
+                    almacenar.append((actual.destino, actual.peso))  
+                    actual = actual.siguiente
+                return almacenar
+            case "DFS":
+                almacenar = []
+                actual = self.inicio
+                while actual:
+                    almacenar.append((actual.destino, int(actual.peso)))
+                    actual = actual.siguiente
+                return almacenar
 class Grafo:
     def __init__(self):
         self.grafo = {}
@@ -582,7 +606,7 @@ class Grafo:
         self.objetos = []
         self.accEliSalSal()
     def accEliSalSal(self):
-        #          ROMPER EL BUCLE
+        # ROMPER EL BUCLE
         if self.contador >= self.rango:
             messagebox.showinfo('Completado', f'Se han eliminado TODAS las salas correctamente')
             return
@@ -1018,7 +1042,85 @@ class Grafo:
         canvas = FigureCanvasTkAgg(ima, master=ventana)
         canvas.draw()
         canvas.get_tk_widget().pack(expand=True, fill="both")
-    
+    def mostrar_lista_salas(self, contenedor):
+        # Etiqueta caminos desde
+        self.eti_de_salas = tk.Label(
+            contenedor,
+            text=f"Lista de salas ",            # Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Posiciones
+        self.eti_de_salas.pack(pady=10)
+        # Crear contenedor
+        self.texto_mostrar = tk.Text(contenedor,                 # En donde se coloca el contenedor
+                                     width=160,                  # Ancho de la etiqueta
+                                     height=30,                  # Define cuantas líneas de texto se pueden mostrar                 
+                                     font=("Century Gothic", 10),# Fuente, tamaño y estilo
+                                     fg="black",                 # Color del texto
+                                     bg="#f0f0f0"                # Color de fondo de la etiqueta
+                                     )
+        self.texto_mostrar.pack(fill="both", expand=True, pady=10)
+        lista_de_salas = []
+        for sala, caminos in self.grafo.items():
+            lista_de_salas.append(f"{sala} -- {caminos.mostnomnue()}")
+        texto = "\n\n".join(lista_de_salas)
+        self.texto_mostrar.insert(tk.END, texto)
+        self.texto_mostrar.config(state="disabled")
+    def most_mat_ady(self, contenedor):
+        # Etiqueta 
+        self.Etiqueta_titmat = tk.Label(
+                contenedor,
+                text=f"Matriz de adyacencia ",      # Texto que muestra la etiqueta
+                font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+                fg="black",                         # Color del texto
+                bg="#f0f0f0",                       # Color del fondo de la etiqueta
+                width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+                anchor="center",                    # Posición del texto dentro de la etiqueta
+                relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+                bd=2,                               # Grosor del borde
+                padx=10,                            # Espacio interno horizontal
+                pady=5                              # Espacio interno vertical
+        )
+        # Posiciones
+        self.Etiqueta_titmat.pack(pady=10)
+        # Crear contenedor
+        self.mostrar_matriz = tk.Text(
+                contenedor,
+                font=("Century Gothic", 10),        # Fuente, tamaño y estilo (negrita)
+                fg="black",                         # Color del texto
+                bg="#f0f0f0",                       # Color del fondo de la etiqueta
+                width=160,                          # Ancho de la etiqueta (en caracteres aprox.)
+                height=30                           # Define cuantas líneas de texto puede mostrar
+        )
+        self.mostrar_matriz.pack(fill="both", expand=True, pady=10)
+        # Hacer matriz
+        nodos = list(self.grafo.keys())
+        n = len(nodos)
+        posicion = {nodo: indice for indice, nodo in enumerate(nodos)}
+        matriz_most = [[0] * n for _ in range(n)]
+        for clave, valor in self.grafo.items():
+            origen = posicion[clave]
+            nombres = valor.listnommat("imprimir")
+            for final, peso in nombres:
+                destino = posicion[final]
+                matriz_most[origen][destino] = peso
+        # convertir a cadena
+        texto = "\n \n\n\n"
+        for lista, listas in enumerate(matriz_most):
+            texto_lista = " ".join(str(elemento) for elemento in listas)
+            texto += f"\t\t{nodos[lista]}\t\t\t\t{texto_lista}\n"
+        self.mostrar_matriz.insert(tk.END, texto)
+        self.mostrar_matriz.config(state="disabled")
+
+                
 #-----------CLASES DE LA INTERFAZ----------
 
 class VentanaPrincipal:
@@ -1427,7 +1529,7 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.regresar
+            command=lambda:self.regresar_vent_prin()
         )
         # Posiciones
         self.etiquetaEspacio7.pack(pady = 26)
@@ -1771,7 +1873,7 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.mosLisSal
+            command=self.mostrar_salas
         )
         self.botonMosMatAdy = tk.Button(
             self.marAcc,
@@ -1786,7 +1888,7 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.regresar
+            command=self.mostrar_matriz_
         )
         self.botonMosMap = tk.Button(
             self.marAcc,
@@ -1830,7 +1932,24 @@ class IniciarSesioncomoAdministrador:
         self.marAcc.pack(expand=True)
         # Funcion
         grafo.mostrarMapa(self.marAcc)
-
+    def mostrar_salas(self):
+        self.limpiarImagen()
+        # Hacer de nuevo el contenedor temporal
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+        # Funcion
+        grafo.mostrar_lista_salas(self.marAcc)
+    def regresar_vent_prin(self):
+        self.ventControl.destroy()
+        VentanaPrincipal()
+    def mostrar_matriz_(self):
+        self.limpiarImagen()
+        # Hacer de nuevo el contenedor temporal
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+        # Funcion
+        grafo.most_mat_ady(self.marAcc)
+        
 # 4.- ---------- Variables u objetos globales ----------
 
 # Grafo
