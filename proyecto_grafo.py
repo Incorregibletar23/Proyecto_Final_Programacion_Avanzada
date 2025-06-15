@@ -34,9 +34,9 @@ Fechas de modificación:
         - 13/06/2025 5:06 pm(v2.4: Se modifico el subboton mostrar,lista de salas)
         - 13/06/2025 5:46 pm(v2.5: Se agregaron las funciones para mostrar la lista de salas)
         - 14/06/2025 4:56 pm(v2.6: Se modifico el subboton mostrar,regresar)
-        - 14/06/2025 4:56 pm(v2.7: Se agrego la función para regresar)
-        - 14/06/2025 4:56 pm(v2.5: Se modifico el subboton mostrar,matriz de adyacencia)
-        - 14/06/2025 4:56 pm(v2.5: Se agregaron las funciones para mostrar matriz)
+        - 14/06/2025 5:30 pm(v2.7: Se agrego la función para regresar)
+        - 14/06/2025 6:15 pm(v2.8: Se modifico el subboton mostrar,matriz de adyacencia)
+        - 14/06/2025 6:23 pm(v2.8: Se agregaron las funciones para mostrar matriz)
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
@@ -68,7 +68,6 @@ class NodoDoble:
         self.peso = peso
         self.siguiente = None
         self.anterior = None
-
 class ListaDobleEnlazada:
     def __init__(self):
         self.inicio = None
@@ -108,7 +107,6 @@ class ListaDobleEnlazada:
             aristas.append((actual.destino, actual.peso))
             actual = actual.siguiente
         return aristas
-
 class Grafo:
     def __init__(self):
         self.grafo = {}
@@ -162,7 +160,6 @@ class Grafo:
             if origen in self.grafo:
               if destino in self.grafo:
                   eliminado = self.grafo[origen].eliminar(destino)
-
                   if not eliminado:
                       raise ValueError(f"No existe un camino de {origen} a {destino}.")
                       time.sleep(2.2)
@@ -234,8 +231,6 @@ class Grafo:
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
         plt.title("Mapa de salas")
         plt.show()
-
-
     def menu(self):
         print()
         while True:
@@ -290,13 +285,11 @@ class BusquedaDeCamino:
         if actual == self.destino:
             self.caminos.append((camino, distancia))
             return
-
         for s, d in enumerate(self.matriz[actual]):
             if d != 0 and s not in camino:
                 self.recursividad(s, camino + [s], distancia + d)
     def dfs(self):
         self.recursividad(self.origen, [self.origen], 0)
-
         if not self.caminos:
             return None, []
         else:
@@ -304,15 +297,12 @@ class BusquedaDeCamino:
             for _, d in self.caminos[1:]:
                 if d < distanciaminima:
                     distanciaminima = d
-
             caminosminimos = [i for i, d in self.caminos if d == distanciaminima]
             return distanciaminima, caminosminimos
-
 def usoMemoria():
     current, peak = tracemalloc.get_traced_memory()
     print(f"Memoria utilizada: {current / (1024 ** 2):.2f} MB")
     print(f"Memoria máxima utilizada: {peak / (1024 ** 2):.2f} MB")
-
 def menu_usuario(grafo):
     print()
     while True:
@@ -321,10 +311,8 @@ def menu_usuario(grafo):
         print("2. Calcular el camino más corto entre dos salas")
         print("3. Salir")
         print()
-
         try:
             opcion = input("Selecciona una opción: ")
-
             if opcion == '1':
                 grafo.visualizar()
                 time.sleep(10)
@@ -359,12 +347,10 @@ def menu_usuario(grafo):
                 raise ValueError("Opción no válida.")
         except ValueError as e:
             print(e)
-
 def menu()
     grafo = Grafo()
     for i in range(12):
         grafo.grafo[str(i)] = ListaDobleEnlazada()
-
     conexiones = [
         [0, 4, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 3, 0, 0, 5, 0, 0, 0, 0, 0, 0],
@@ -379,7 +365,6 @@ def menu()
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ]
-
     for i in range(len(conexiones)):
         for j in range(len(conexiones[i])):
             peso = conexiones[i][j]
@@ -406,15 +391,11 @@ def menu()
                     [3, 0, 0, 1],
                     [0, 1, 1, 0]
                 ]
-
-
                 busqueda = BusquedaDeCamino(matriz, 0, 3)
                 distancia, caminos = busqueda.dfs()
                 print(distancia)
                 print(caminos)
                 time.sleep(7)
-
-
             else:
                 raise ValueError("Opción no válida.")
         except ValueError as e:
@@ -518,7 +499,7 @@ class ListaDobleEnlazada:
                 almacenar = []
                 actual = self.inicio
                 while actual:
-                    almacenar.append((actual.destino, int(actual.peso)))
+                    almacenar.append((actual.destino, actual.peso))
                     actual = actual.siguiente
                 return almacenar
 
@@ -1127,6 +1108,19 @@ class Grafo:
             texto += f"\t\t{nodos[lista]}\t\t\t\t{texto_lista}\n"
         self.mostrar_matriz.insert(tk.END, texto)
         self.mostrar_matriz.config(state="disabled")
+    def gradatDFS(self, sala_origen,):
+        vertices = list(self.grafo.keys())
+        n = len(vertices)
+        indices = {nodos: i for i, nodos in enumerate(vertices)}
+        matriz = [[0] * n for _ in range(n)]
+        for vertice, lista in self.grafo.items():
+            origenind = indices[vertice]
+            aristas = lista.listnommat("DFS")
+            for destino,peso in aristas:
+                destinoind = indices[destino]
+                matriz[origenind][destinoind] = int(peso)
+        return matriz, indices, vertices
+        
 
                 
 #-----------CLASES DE LA INTERFAZ----------
@@ -1574,7 +1568,7 @@ class IniciarSesioncomoAdministrador:
         )
         self.botonBuscar = tk.Button(
             self.menu,
-            text='Buscar',
+            text=' DFS ',
             font=("Century Gothic", 10),
             bg="#abaeb8",              # Fondo
             fg="black",                # Color del texto
@@ -1585,7 +1579,7 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.regresar
+            command=self.ingdatDFS_
         )
         self.botonReg = tk.Button(
             self.menu,
@@ -2020,9 +2014,135 @@ class IniciarSesioncomoAdministrador:
         self.marAcc.pack(expand=True)
         # Funcion
         grafo.most_mat_ady(self.marAcc)
+    def ingdatDFS_(self):
+        self.limpiarImagen()
+        #-----------MARCO DE ACCION PARA MANIPULAR EL GRAFO----------
 
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+
+        #-----------COSAS DE LA SUBVENTANA MARCOFORMULARIO----------
+        # Etiqueta Sala origen
+        self.etiqueta_cam_1 = tk.Label(
+            self.marAcc,
+            text=f"Ingresa el nombre de la sala de Origen",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.etiqueta_cam_2 = tk.Label(
+            self.marAcc,
+            text=f"Ingresa el nombre de la sala de Destino ",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entrada de nombre de sala
+        self.entrada_cam_1 = tk.Entry(
+            self.marAcc,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo
+            fg="#333333",           # Texto
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        self.entrada_cam_2 = tk.Entry(
+            self.marAcc,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo
+            fg="#333333",           # Texto
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Boton ingresar el camino
+        self.boton = tk.Button(
+            self.marAcc,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=23,                   # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.cap_datos
+        )
+        # Posiciones
+        self.etiqueta_cam_1.pack(pady=10)
+        self.entrada_cam_1.pack(pady=10)
+        self.etiqueta_cam_2.pack(pady=10)
+        self.entrada_cam_2.pack(pady=10)
+        self.boton.pack(pady=10)
+    def cap_datos(self):
+        # Capturar Datos
+        sala_origen = self.entrada_cam_1.get()
+        sala_destino = self.entrada_cam_2.get()
+        # DFS
+        if sala_origen in grafo.grafo and sala_destino in grafo.grafo:
+            matriz, indices, nodos = grafo.gradatDFS()
+            o = indices[sala_origen]
+            d = indices[sala_destino]
+            buscador = BusquedaDeCamino(matriz, o, d)
+            distancia, caminos = buscador.dfs()
+            if caminos:
+                caminos_nombre = []
+                # Traducir a nombres
+                for camino in caminos:
+                    camino_nombres = [nodos[i] for i in camino]
+                    caminos_nombre.append(" → ".join(camino_nombres))
+            # Texto mostrar
+                mostrar = f"Distancia mas corta {distancia}"
+                for i, cam in enumerate(caminos_nombre):
+                    salida += f"Camino {i}:{cam}\n"
+                
+                
+       
 # 4.- ---------- Variables u objetos globales ----------
-
+class BusquedaDeCamino:
+    def __init__(self, matriz, origen, destino):
+        self.matriz = matriz
+        self.origen = origen
+        self.destino = destino
+        self.caminos = []
+    def recursividad(self, actual, camino, distancia):
+        if actual == self.destino:
+            self.caminos.append((camino, distancia))
+            return
+        for s, d in enumerate(self.matriz[actual]):
+            if d != 0 and s not in camino:
+                self.recursividad(s, camino + [s], distancia + d)
+    def dfs(self):
+        self.recursividad(self.origen, [self.origen], 0)
+        if not self.caminos:
+            return None, []
+        else:
+            distanciaminima = self.caminos[0][1]
+            for _, d in self.caminos[1:]:
+                if d < distanciaminima:
+                    distanciaminima = d
+            caminosminimos = [i for i, d in self.caminos if d == distanciaminima]
+            return distanciaminima, caminosminimos
 # Grafo
 grafo = Grafo()
 #-----------Agregar las salas iniciales al empezar el código----------
