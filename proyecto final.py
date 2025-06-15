@@ -5,52 +5,21 @@ Programa: Proyecto Grafo - proyecto_grafo.py
 Autores:
 - Ramírez Vásquez Eduardo
 - Rosas López Renata
-Fecha de creación: 14/05/2025
+Fecha de creación: 15/06/2025
 Fechas de modificación:
     Eduardo:
-        - 31/05/2025 2:30 pm(v2.1: Se empezará a hacer la interfaz gráfica del proyecto)
-        - 01/06/2025 2:13 pm(v2.2: Se hace el lobby de la aplicación)
-        - 02/06/2025 1:32 pm(v2.2: Prueba 7)
-        - 02/06/2025 1:52 pm(v2.2: Prueba 8)
-        - 02/06/2025 2:40 pm(v2.2: Pruebas de github finalizadas, se empezará a trabajar en conjunto ahora)
-        - 02/06/2025 2:40 pm(v2.3: Agregue las especificaciones de bordes)
-        - 02/06/2025 1:24 pm(v2.4: Empecé a hacer la interfaz gráfica de administrador)
-        - 07/06/2025 5:30 pm(v2.5: Se agregó el grafo y se empezó a hacer el botón de agregar salas)
-        - 08/06/2025 1:48 pm(v2.6: Se agregó la funcion de agregar salas al botón)
-        - 08/06/2025 1:48 pm(v2.7: Se agregaron las salas iniciales al abrir el código)
-        - 08/06/2025 2:48 pm(v2.8: Se agregó la funcion de eliminar salas al botón)
-        - 08/06/2025 3:48 pm(v2.9: Se agregó la funcion de agregar caminos al botón)
-        - 08/06/2025 4:41 pm(v2.10: Se agregó la funcion de eliminar caminos al botón)
-        - 08/06/2025 9:46 pm(v2.11: Se hizo las funciones de  el botón de mostrar y el subbotón salas)
-        - 09/06/2025 3:07 pm(v2.12: Se hizo el mapa)
-        - 12/06/2025 10:13 am(v2.13: Se agregaron funciones a los botones de usuario)
+        - 12/06/2025 10:13 am(v3.1: Se empezó a hacer el proyecto final incluyendo todos los temas vistos)
 
     Renata:
-        - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
-        - 02/06/2025 1:32 pm(v2.2: Prueba 6)
-        - 02/06/2025 1:55 pm(v2.2: Prueba 9)
-        - 02/06/2025 1:32 pm(v2.2: Prueba 10)
-        - 08/06/2025 9:48 pm(v2.3: Empece a modificar la ventana usuario)
-        - 13/06/2025 5:06 pm(v2.4: Se modifico el subboton mostrar,lista de salas)
-        - 13/06/2025 5:46 pm(v2.5: Se agregaron las funciones para mostrar la lista de salas)
-        - 14/06/2025 4:56 pm(v2.6: Se modifico el subboton mostrar,regresar)
-        - 14/06/2025 4:56 pm(v2.7: Se agrego la función para regresar)
-        - 14/06/2025 4:56 pm(v2.5: Se modifico el subboton mostrar,matriz de adyacencia)
-        - 14/06/2025 4:56 pm(v2.5: Se agregaron las funciones para mostrar matriz)
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
-
-#           IMPORTACIONES PARA TERMINAL
 
 import os
 import networkx as nx
 import matplotlib.pyplot as plt
 import tracemalloc
 import time
-
-#           FIN DE IMPORTACIONES PARA TERMINAL
-
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
@@ -59,368 +28,108 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # 3.- ---------- Definición de funciones o clases ----------
 
-#-----------CLASES PARA USO EN LA TERMINAL:----------
+#-----------CLASES DEL ARBOL----------
 
-'''
-class NodoDoble:
-    def __init__(self, destino, peso):
-        self.destino = destino
-        self.peso = peso
-        self.siguiente = None
-        self.anterior = None
+class Nodo:
+  def __init__(self, dato):
+    self.dato = dato
+    self.izquierda = None
+    self.derecha = None
 
-class ListaDobleEnlazada:
-    def __init__(self):
-        self.inicio = None
-    def insertarFinal(self, destino, peso):
-        nuevo_nodo = NodoDoble(destino, peso)
-        if not self.inicio:
-            self.inicio = nuevo_nodo
-            return
-        actual = self.inicio
-        while actual.siguiente:
-            actual = actual.siguiente
-        actual.siguiente = nuevo_nodo
-        nuevo_nodo.anterior = actual
-    def eliminar(self, destino):
-        actual = self.inicio
-        while actual:
-            if actual.destino == destino:
-                if actual.anterior:
-                    actual.anterior.siguiente = actual.siguiente
-                if actual.siguiente:
-                    actual.siguiente.anterior = actual.anterior
-                if actual == self.inicio:
-                    self.inicio = actual.siguiente
-                return True
-            actual = actual.siguiente
-        return False
-    def mostrar(self):
-        actual = self.inicio
-        while actual:
-            print(f"{actual.destino}--{actual.peso}--", end=" -> ")
-            actual = actual.siguiente
-        print("None")
-    def lista_de_aristas(self):
-        aristas = []
-        actual = self.inicio
-        while actual:
-            aristas.append((actual.destino, actual.peso))
-            actual = actual.siguiente
-        return aristas
-
-class Grafo:
-    def __init__(self):
-        self.grafo = {}
-    def agregar_vertice(self):
-        while True:
-            try:
-                rango = int(input('¿Cuántas salas vas a ingresar? '))
-                break
-            except ValueError:
-                print("Por favor, ingresa un número entero.")
-        for i in range(rango):
-            vertice = input(f'Ingresa sala {i+1}: ')
-            if vertice in self.grafo:
-                print(f"La sala '{vertice}' ya existe.")
-                time.sleep(2.2)
-            else:
-                self.grafo[vertice] = ListaDobleEnlazada()
-                print(f"Sala '{vertice}' agregada.")
-                time.sleep(2.2)
-    def agregar_arista(self):
-        while True:
-            try:
-                rango = int(input('¿Cuántos caminos vas a ingresar? '))
-                break
-            except ValueError:
-                print("Por favor, ingresa un número entero válido para los caminos.")
-        for _ in range(rango):
-            nodo_1 = input('Ingresa sala de origen: ')
-            nodo_2 = input('Ingresa Sala de destino: ')
-            while True:
-                try:
-                    peso = int(input('Ingresa distancia entre salas: '))
-                    break
-                except ValueError:
-                    print("Por favor, ingresa un entero para las distancias.")
-            if nodo_1 in self.grafo:
-                if nodo_2 in self.grafo:
-                    self.grafo[nodo_1].insertarFinal(nodo_2, peso)
-                    print(f'Sala de {nodo_1} a {nodo_2} agregada con {peso} metros de separación')
-                    time.sleep(3)
-                else:
-                    print(f'{nodo_2} no existe.')
-                    time.sleep(2.2)
-            else:
-                print(f'{nodo_1} no existe.')
-                time.sleep(2.2)
-    def eliminar_arista(self):
-        origen = input('Ingresa sala de origen: ')
-        destino = input('Ingresa sala de destino: ')
-        try:
-            if origen in self.grafo:
-              if destino in self.grafo:
-                  eliminado = self.grafo[origen].eliminar(destino)
-
-                  if not eliminado:
-                      raise ValueError(f"No existe un camino de {origen} a {destino}.")
-                      time.sleep(2.2)
-                  else:
-                      print(f"Sala de {origen} a {destino} eliminada.")
-                      time.sleep(2.2)
-              else:
-                  raise KeyError(f"La sala: {destino} no existe.")
-                  time.sleep(2.2)
-            else:
-                raise KeyError(f"La sala: {origen} no existe.")
-                time.sleep(2.2)
-        except (KeyError, ValueError) as e:
-            print(e)
-            time.sleep(2.5)
-    def eliminar_vertice(self):
-        vertice = input('Ingresa la sala que quieres eliminar: ')
-        try:
-            if vertice in self.grafo:
-                del self.grafo[vertice]
-                for lista in self.grafo.values():
-                    lista.eliminar(vertice)
-                print(f"Sala '{vertice}' eliminado.")
-                time.sleep(2.2)
-            else:
-                raise KeyError(f"La sala '{vertice}' no existe.")
-                time.sleep(2.2)
-        except KeyError as e:
-            print(e)
-            time.sleep(2.2)
-    def encontrar(self):
-        vertice = input('Ingresa sala a buscar: ')
-        if vertice in self.grafo:
-            print(f"Caminos desde '{vertice}':")
-            self.grafo[vertice].mostrar()
-            time.sleep(5)
-        else:
-            print(f"La sala: '{vertice}' no existe.")
-            time.sleep(2.2)
-    def ver_grafo(self):
-        print("Mostrando salas en lista:")
-        for vertice, lista in self.grafo.items():
-            print(f"{vertice} -> ", end="")
-            lista.mostrar()
-        time.sleep(7)
-    def matriz_de_adyacencia(self):
-        vertices = list(self.grafo.keys())
-        n = len(vertices)
-        indices = {nodo: i for i, nodo in enumerate(vertices)}
-        matriz = [[0] * n for _ in range(n)]
-        for vertice, lista in self.grafo.items():
-            origen_idx = indices[vertice]
-            aristas = lista.lista_de_aristas()
-            for destino, peso in aristas:
-                destino_idx = indices[destino]
-                matriz[origen_idx][destino_idx] = int(peso)
-        print('MATRIZ DE ADYACENCIA')
-        for fila in matriz:
-            print(fila)
-        return matriz
-    def visualizar(self):
-        G = nx.DiGraph()
-        for origen, lista in self.grafo.items():
-            for destino, peso in lista.lista_de_aristas():
-                G.add_edge(origen, destino, weight=peso)
-        pos = nx.spring_layout(G)
-        nx.draw(G, pos, with_labels=True, node_color='skyblue', node_size=2000, arrows=True)
-        edge_labels = nx.get_edge_attributes(G, 'weight')
-        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-        plt.title("Mapa de salas")
-        plt.show()
-
-
-    def menu(self):
-        print()
-        while True:
-            print("--- Bienvenido administrador ---")
-            print("1. Agregar salas")
-            print("2. Agregar caminos")
-            print("3. Mostrar lista de salas")
-            print("4. Ver mapa")
-            print("5. Eliminar sala")
-            print("6. Eliminar camino")
-            print("7. Buscar caminos de una sala")
-            print('8. Ver matriz de adyacencia de salas')
-            print("9. Ver uso de memoria")
-            print("10. Salir")
-            print()
-            try:
-                opcion = input("Selecciona una opción: ")
-                if opcion == '1':
-                    self.agregar_vertice()
-                elif opcion == '2':
-                    self.agregar_arista()
-                elif opcion == '3':
-                    self.ver_grafo()
-                elif opcion == '4':
-                    self.visualizar()
-                    time.sleep(10)
-                elif opcion == '5':
-                    self.eliminar_vertice()
-                elif opcion == '6':
-                    self.eliminar_arista()
-                elif opcion == '7':
-                    self.encontrar()
-                elif opcion == '8':
-                    self.matriz_de_adyacencia()
-                    time.sleep(10)
-                elif opcion == '9':
-                    usoMemoria()
-                    time.sleep(4)
-                elif opcion == '10':
-                    break
-                else:
-                    raise ValueError("Opción no válida.")
-            except ValueError as e:
-                print(e)
-class BusquedaDeCamino:
-    def __init__(self, matriz, origen, destino):
-        self.matriz = matriz
-        self.origen = origen
-        self.destino = destino
-        self.caminos = []
-    def recursividad(self, actual, camino, distancia):
-        if actual == self.destino:
-            self.caminos.append((camino, distancia))
-            return
-
-        for s, d in enumerate(self.matriz[actual]):
-            if d != 0 and s not in camino:
-                self.recursividad(s, camino + [s], distancia + d)
-    def dfs(self):
-        self.recursividad(self.origen, [self.origen], 0)
-
-        if not self.caminos:
-            return None, []
-        else:
-            distanciaminima = self.caminos[0][1]
-            for _, d in self.caminos[1:]:
-                if d < distanciaminima:
-                    distanciaminima = d
-
-            caminosminimos = [i for i, d in self.caminos if d == distanciaminima]
-            return distanciaminima, caminosminimos
-
-def usoMemoria():
-    current, peak = tracemalloc.get_traced_memory()
-    print(f"Memoria utilizada: {current / (1024 ** 2):.2f} MB")
-    print(f"Memoria máxima utilizada: {peak / (1024 ** 2):.2f} MB")
-
-def menu_usuario(grafo):
+class ABB:
+  def __init__(self):
+    self.raiz = None
+  def insertar(self, dato):
+    nuevo_nodo = Nodo(dato)
+    if self.raiz is None:
+      self.raiz = nuevo_nodo
+    else:
+      self._insertar_recursivo(dato, self.raiz)
+  def _insertar_recursivo(self, dato, nodo_actual):
+    if dato < nodo_actual.dato:
+      if nodo_actual.izquierda is None:
+        nodo_actual.izquierda = Nodo(dato)
+      else:
+        self._insertar_recursivo(dato, nodo_actual.izquierda)
+    if dato > nodo_actual.dato:
+      if nodo_actual.derecha is None:
+        nodo_actual.derecha = Nodo(dato)
+      else:
+        self._insertar_recursivo(dato, nodo_actual.derecha)
+  def _imprimir(self):
+    self._imprimir_recursivo(self.raiz,0)
+  def _imprimir_recursivo(self, nodo_actual, nivel):
+    if nodo_actual is not None:
+      self._imprimir_recursivo(nodo_actual.derecha, nivel + 1)
+      print("      "  * nivel + f'-> {nodo_actual.dato}')
+      self._imprimir_recursivo(nodo_actual.izquierda, nivel + 1)
+  def verimagen(self, nombre="arbol_binario"):
+    punto = Digraph()
+    punto.attr('node', shape='circle')
+    if self.raiz is not None:
+      self.verimagen_recursivo(self.raiz, punto)
+    return punto
+  def verimagen_recursivo(self, nodo_actual, punto):
+    punto.node(str(nodo_actual.dato))
+    if nodo_actual.izquierda is not None:
+      punto.edge(str(nodo_actual.dato), str(nodo_actual.izquierda.dato))
+      self.verimagen_recursivo(nodo_actual.izquierda, punto)
+    if nodo_actual.derecha is not None:
+      punto.edge(str(nodo_actual.dato), str(nodo_actual.derecha.dato))
+      self.verimagen_recursivo(nodo_actual.derecha, punto)
+  def inorden(self):
+    print('Inorden', end=' ')
+    self.inorden_recursivo(self.raiz)
     print()
-    while True:
-        print("--- Bienvenido usuario ---")
-        print("1. Mostrar mapa")
-        print("2. Calcular el camino más corto entre dos salas")
-        print("3. Salir")
-        print()
+  def inorden_recursivo(self, nodo_actual):
+    if nodo_actual is not None:
+      self.inorden_recursivo(nodo_actual.izquierda)
+      print(nodo_actual.dato, end=' ')
+      self.inorden_recursivo(nodo_actual.derecha)
+  def preorden(self):
+    print('Preorden', end=' ')
+    self.preorden_recursivo(self.raiz)
+    print()
+  def preorden_recursivo(self, nodo_actual):
+    if nodo_actual is not None:
+      print(nodo_actual.dato, end=' ')
+      self.preorden_recursivo(nodo_actual.izquierda)
+      self.preorden_recursivo(nodo_actual.derecha)
+  def postorden(self):
+    print('Postorden', end=' ')
+    self.postorden_recursivo(self.raiz)
+    print()
+  def postorden_recursivo(self, nodo_actual):
+    if nodo_actual is not None:
 
-        try:
-            opcion = input("Selecciona una opción: ")
+      self.postorden_recursivo(nodo_actual.izquierda)
 
-            if opcion == '1':
-                grafo.visualizar()
-                time.sleep(10)
-            elif opcion == '2':
-                grafo.visualizar()
-                time.sleep(1)
-                origen = input("Ingresa el vértice de origen: ")
-                destino = input("Ingresa el vértice de destino: ")
-                if origen in grafo.grafo and destino in grafo.grafo:
-                    vertices = list(grafo.grafo.keys())
-                    indices = {nodo: i for i, nodo in enumerate(vertices)}
-                    matriz = grafo.matriz_de_adyacencia()
-                    origen_idx = indices[origen]
-                    destino_idx = indices[destino]
-                    busqueda = BusquedaDeCamino(matriz, origen_idx, destino_idx)
-                    distancia, caminos = busqueda.dfs()
-                    if distancia is None:
-                        print(f"No hay camino entre {origen} y {destino}.")
-                        time.sleep(2.2)
-                    else:
-                        print(f"La distancia más corta es: {distancia}")
-                        print("Posibles caminos:")
-                        for camino in caminos:
-                            print(" -> ".join([list(grafo.grafo.keys())[i] for i in camino]))
-                        time.sleep(10)
-                else:
-                    print(f"Uno o ambas salas '{origen}' y '{destino}' no existen.")
-                    time.sleep(2.2)
-            elif opcion == '3':
-                break
-            else:
-                raise ValueError("Opción no válida.")
-        except ValueError as e:
-            print(e)
-
-def menu()
-    grafo = Grafo()
-    for i in range(12):
-        grafo.grafo[str(i)] = ListaDobleEnlazada()
-
-    conexiones = [
-        [0, 4, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 3, 0, 0, 5, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0],
-        [2, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0],
-        [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 1, 0],
-        [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 7],
-        [0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 3, 0, 0, 4, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ]
-
-    for i in range(len(conexiones)):
-        for j in range(len(conexiones[i])):
-            peso = conexiones[i][j]
-            if peso != 0:
-                grafo.grafo[str(i)].insertarFinal(str(j), peso)
-    while True:
-        print("--- Bienvenido ---")
-        print("1. Entrar como Administrador")
-        print("2. Entrar como Usuario")
-        print("3. Salir")
-        try:
-            opcion = input("Selecciona una opción: ")
-            if opcion == '1':
-                grafo.menu()
-            elif opcion == '2':
-                menu_usuario(grafo)
-            elif opcion == '3':
-                break
-            elif opcion == '4':
-
-                matriz = [
-                    [0, 4, 3, 0],
-                    [4, 0, 0, 1],
-                    [3, 0, 0, 1],
-                    [0, 1, 1, 0]
-                ]
-
-
-                busqueda = BusquedaDeCamino(matriz, 0, 3)
-                distancia, caminos = busqueda.dfs()
-                print(distancia)
-                print(caminos)
-                time.sleep(7)
-
-
-            else:
-                raise ValueError("Opción no válida.")
-        except ValueError as e:
-            print(e)
-'''
-#-----------FIN DE LAS CLASES DE TERMINAL----------
+      self.postorden_recursivo(nodo_actual.derecha)
+      print(nodo_actual.dato, end=' ')
+  def eliminar(self, dato):
+    self.raiz = self._eliminar_recursivo(dato, self.raiz)
+  def _eliminar_recursivo(self, dato, nodo_actual):
+    if nodo_actual is None:
+      return nodo_actual
+    if dato < nodo_actual.dato:
+      nodo_actual.izquierda = self._eliminar_recursivo(dato, nodo_actual.izquierda)
+    elif dato > nodo_actual.dato:
+      nodo_actual.derecha = self._eliminar_recursivo(dato, nodo_actual.derecha)
+    else:
+      if nodo_actual.izquierda is None:
+        return nodo_actual.derecha
+      elif nodo_actual.derecha is None:
+        return nodo_actual.izquierda
+      temp = self._encontrar_minimo(nodo_actual.derecha)
+      nodo_actual.dato = temp.dato
+      nodo_actual.derecha = self._eliminar_recursivo(temp.dato, nodo_actual.derecha)
+    return nodo_actual
+  def _encontrar_minimo(self, nodo_actual):
+    while nodo_actual.izquierda is not None:
+      nodo_actual = nodo_actual.izquierda
+    return nodo_actual
+  def display(self):
+    display(self.verimagen())
 
 #-----------CLASES DEL GRAFO----------
 
@@ -1215,7 +924,85 @@ class VentanaPrincipal:
         IniciarSesioncomoAdministrador()
     def abrirUsu(self):
         self.ventanaPrincipal.destroy()
-        IniciarSesioncomoUsuario()
+        ChecarID()
+
+class ChecarID:
+    def __init__(self):
+        self.venChe = tk.Tk()
+        self.venChe.title('ID')
+        self.venChe.geometry('800x600+300+0')
+        # Icono de la ventana
+        self.venChe.iconbitmap('Logous.ico')
+        self.checarID()
+    def checarID(self):
+        # Cosas de la ventana ID
+        self.etiquetaEspacio10 = tk.Label(self.venChe, text="   ", font=("Century Gothic", 12))
+        self.etiquetaEspacio11 = tk.Label(self.venChe, text="   ", font=("Century Gothic", 12))
+        self.etiquetaID = tk.Label(self.venChe, text="Escribe tu ID de Usuario", font=("Century Gothic", 12))
+        self.entradaID = tk.Entry(
+            self.venChe,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo 
+            fg="black",             # Texto 
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=23,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        self.botonIngID = tk.Button(
+            self.venChe,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=76,                   # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.cP
+        )
+        self.etiquetaTitulo = tk.Label(
+            self.venChe,
+            text="¿No tienes id aun? ¡Crea uno!",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=30,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.botonCreID = tk.Button(
+            self.venChe,
+            text='Crear ID',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=76,                    # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.cP
+        )
+        # Posiciones
+        self.etiquetaEspacio10.pack(pady=45)
+        self.etiquetaID.pack(pady=5)
+        self.entradaID.pack(pady=5)
+        self.botonIngID.pack(pady=5)
+        self.etiquetaEspacio11.pack(pady=7)
+        self.etiquetaTitulo.pack(pady=5)
+        self.botonCreID.pack(pady=5)
+    def cP(self):
+        print(1)
 
 class IniciarSesioncomoUsuario:
     def __init__(self):
@@ -2050,6 +1837,12 @@ for conexion in range(len(conexiones)):
             origen = salasIniciales[conexion]
             destino = salasIniciales[conexionj]
             grafo.grafo[origen].insertarFinal(destino, distancia)
+# Arbol
+arbolID = ABB()
+arbolID.insertar("202501")
+arbolID.insertar("202502")
+arbolID.insertar("202503")
+arbolID.insertar("202504")
 
 # 5.- ---------- Bloque Principal ----------
 if __name__ == '__main__':
@@ -2060,55 +1853,8 @@ if __name__ == '__main__':
 '''
 Búsqueda de información:
     - Chatgpt:
-        + Como modificar el boton
-        + Bold en la letra significa negritas
-        + lambda: es para los botones, para que se ejecute toda la clase al dar click al boton
-        + Es mejor usar funciones para abrir nuevas ventanas y poder utilizarlas, ya que con una funcion cierras
-        la ventana
-        + Como modificar las etiquetas
-        + En donde va el texto (posición) es con anchor, este puede ser:
-            ~ center: al centro
-            ~ w: a la izquierda
-            ~ e: a la cerecha
-            ~ n: arriba
-            ~ s: abajo
-            ~ nw: arriba e izquierda
-            ~ se: abajo derecha
-        + Los tipos de borde para el boton son:
-            ~ flat: sin borde
-            ~ raised: efecto 3D
-            ~ sunken: hundido
-            ~ groove: con ranura
-            ~ ridge: con relieve
-        + fill en pack controla la manera en que se expande un witget (en este caso la barra naranjarosa) en el
-        contenedor, sus opciones son:
-            ~ none: mantiene su tamaño mínimo
-            ~ x: se expande horizontalmente para llenar todo lo ancho posible
-            ~ y: se expande verticalmente para llenar todo el alto posible
-            ~ both: se expande en ambas direcciones para llenar todo el espacio posible
-        + Para agregar la ventana en dos partes es necesario usar tk.Frame, y en width es la anchura y height es
-        altura en frames
-        + Para hacer que el texto de la subventana de abajo se ponga hasta arriba de la etiqueta, hay que agre-
-        gar anchor='n'
-        + Al usar pack, esta función puede hacer que la ventana lateral del menú sea lo más estrecha posible pa-
-        ra ajustarse lo más posible a los botones
-        + Para destruir objetos, ".destroy" funciona para ventanas y etiquetas (lo usamos en la ventana de admi-
-        nistrador para que se eliminen las etiquetas de bienvenido y selecciona accion)
-        + Fue necesario hacer contenedores extra en la ventana imagen para poder manupilar facilmente esta ven-
-        tana
-        + expand=True sirve para hacer que el marco de accion rellene toda la subventana imagen
-        + En accAgrSalSal, objeto.destroy elimina los objetos de la pantalla, y self.objetos.clear() sirve para
-        eliminarlos de la lista
-        + hasattr(objeto, "atributo") sirve para ver si un objeto tiene un atributo y devuelve True, si no tiene
-        el atributo, devuelve False (en este caso el objeto es self, y el atribut es marco de acción o etiqueta
-        espacio 4)
-        + "separador".join(lista) sirve para combinar los elementos de una lista mas un separador
-        + plt.figure() es la imágen del mapa del grafo
-        + .add_subplot(1,1,1) es el área de donde se pone el grafo networkx
-        + Se utilizó Matplottlib porque es una función que funciona con entornos gráficos
-        + Se utiliza FigureCanvasTkAgg ya que su función es integrar la imágen de matplotlib a la interfaz de
-        tkinter
     - Código del profesor y clasroom de la materia:
         + Esqueleto del código
         + Menú
+    - Formado a partir del proyecto de grafo
 '''
