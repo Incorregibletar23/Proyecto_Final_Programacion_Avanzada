@@ -23,6 +23,7 @@ Fechas de modificación:
         - 08/06/2025 4:41 pm(v2.10: Se agregó la funcion de eliminar caminos al botón)
         - 08/06/2025 9:46 pm(v2.11: Se hizo las funciones de  el botón de mostrar y el subbotón salas)
         - 09/06/2025 3:07 pm(v2.12: Se hizo el mapa)
+        - 12/06/2025 10:13 am(v2.13: Se agregaron funciones a los botones de la sesión de usuario)
 
     Renata:
         - 02/06/2025 1:32 pm(v2.2: Se empieza a probar el github)
@@ -1199,7 +1200,7 @@ class VentanaPrincipal:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=lambda: IniciarSesioncomoUsuario()
+            command=self.abrirUsu
         )
         # Posiciones
         self.etiquetaEspacio1.pack(pady = 35)
@@ -1212,6 +1213,9 @@ class VentanaPrincipal:
     def abrirAdmin(self):
         self.ventanaPrincipal.destroy()
         IniciarSesioncomoAdministrador()
+    def abrirUsu(self):
+        self.ventanaPrincipal.destroy()
+        IniciarSesioncomoUsuario()
 
 class IniciarSesioncomoUsuario:
     def __init__(self):
@@ -1222,7 +1226,34 @@ class IniciarSesioncomoUsuario:
         self.ventUs.iconbitmap('Logous.ico')
         self.divisiones_colores_ventUs()
     # Botones de acciones para usuario --------------------------------------------------------------
-        # 
+        self.etiquetaEspacio8 = tk.Label(
+            self.div_izq,
+            text="   ",  # Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#ccd1d1",                       # Color del fondo de la etiqueta
+            width=8,                            # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=1,                             # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.botonLisSal = tk.Button(
+            self.div_izq,
+            text = "Lista de Salas",
+            font=("Comic Sans MS", 10),
+            bg='#99a3a4',              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#f8f9f9",# Fondo al presionar
+            activeforeground="black",  # Color del texto al presionar
+            padx=14,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.lisSalUsu
+        )
         self.boton_camino_corto = tk.Button(
             self.div_izq,
             text = " Mostrar mapa  ",
@@ -1231,67 +1262,100 @@ class IniciarSesioncomoUsuario:
             fg="black",                # Color del texto
             activebackground="#f8f9f9",# Fondo al presionar
             activeforeground="black",  # Color del texto al presionar
-            padx=15,                    # Espacio horizontal interno
+            padx=9,                    # Espacio horizontal interno
             pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.comandoTemporal_1
+            command=self.mosMapUsu
         )
-        
-        self.boton_camino_corto.pack(pady=50)
-        #
         self.boton_calcular_camino = tk.Button(
             self.div_izq,
-            text = "Calcular camino",
+            text = "Buscar camino",
             font=("Comic Sans MS", 10),
             bg='#99a3a4',              # Fondo
             fg="black",                # Color del texto
             activebackground="#f8f9f9",# Fondo al presionar
             activeforeground="black",  # Color del texto al presionar
-            padx=16,                    # Espacio horizontal interno
+            padx=13,                   # Espacio horizontal interno
             pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.comandoTemporal_2
+            command=self.comandoTemporal_3
         )
-        
-        self.boton_calcular_camino.pack(pady=50)
-
-        self.salir= tk.Button(
+        self.botonRegresar = tk.Button(
             self.div_izq,
-            text = "Salir",
-            font=("Comic Sans MS", 10),
-            bg='#99a3a4',              # Fondo
-            fg="black",                # Color del texto
-            activebackground="#f8f9f9",# Fondo al presionar
-            activeforeground="black",  # Color del texto al presionar
-            padx=17,                   # Espacio horizontal interno
+            text='Regresar',
+            font=("Century Gothic", 10),
+            bg="red",                  # Fondo
+            fg="white",                # Color del texto
+            activebackground="#900303",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=30,                    # Espacio horizontal interno
             pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=lambda: self.salir_ventUs()
+            command=self.regresar
         )
-        
-        self.salir.pack(pady=50)
+        self.etiquetaEspacio8.pack(pady=58)
+        self.botonLisSal.pack(pady=10)
+        self.boton_camino_corto.pack(pady=10)
+        self.boton_calcular_camino.pack(pady=10)
+        self.botonRegresar.pack(pady=10)
 
-    def salir_ventUs(self):
-        self.ventUs.destroy()
+        #-----------COSAS DE LA SUBVENTANA USUARIO(fondo)----------
+
+        # Etiqueta de espacio
+        self.etiquetaEspacio9 = tk.Label(self.fondo, text="    ", bg="#f0f0f0", font=("Arial", 12))
+        # Textos
+        self.etiquetaBienUsu = tk.Label(
+            self.fondo,
+            text="¡Bienvenido Usuario!",  # Texto que muestra la etiqueta
+            font=("Century Gothic", 30, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                         # Color del fondo de la etiqueta
+            width=23,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=1,                             # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.etiquetaAccionUsu = tk.Label(self.fondo, text="Seleccione cualquier acción de la barra de menú", bg="#f0f0f0", font=("Century Gothic", 12))
+        # Posiciones
+        self.etiquetaEspacio9.pack(pady = 90)
+        self.etiquetaBienUsu.pack(pady = 10)
+        self.etiquetaAccionUsu.pack(pady = 8)
         
+    def limpiar(self):
+        if hasattr(self, 'etiquetaEspacio9'):
+            self.etiquetaEspacio9.destroy()
+            self.etiquetaBienUsu.destroy()
+            self.etiquetaAccionUsu.destroy()
+        if hasattr(self, 'marAccUsu'):
+            self.marAccUsu.destroy()
+    def lisSalUsu(self):
+        self.limpiar()
+        self.marAccUsu = tk.Frame(self.fondo, bg="#f0f0f0")
+        self.marAccUsu.pack(expand=True)
+        grafo.mostrar_lista_salas(self.marAccUsu)
+    def mosMapUsu(self):
+        self.limpiar()
+        # Hacer de nuevo el contenedor temporal
+        self.marAccUsu = tk.Frame(self.fondo, bg="#f0f0f0")
+        self.marAccUsu.pack(expand=True)
+        # Funcion
+        grafo.mostrarMapa(self.marAccUsu)
     def regresar(self):
-        self.ventus.destroy()
-        Ventanaprincipal()
+        self.ventUs.destroy()
+        VentanaPrincipal()
 
-    def comandoTemporal_1(self):
-        print('funcion')
-        
-    def comandoTemporal_2(self):
+    def comandoTemporal_3(self):
         print('funcion')
         
     def divisiones_colores_ventUs(self):
-        
         # #717d7e
         self.color_arriba = tk.Frame(self.ventUs, bg='#2c3e50', width=800, height=40)
         self.color_arriba.pack(side='top', fill='x')
@@ -1307,7 +1371,7 @@ class IniciarSesioncomoUsuario:
         self.div_izq.pack(side='left', fill='y', anchor = 'nw')
         self.div_izq.pack_propagate(False)
     
-        self.fondo = tk.Frame(self.color_fondo, bg='#fbfcfc', width=300, height=560)
+        self.fondo = tk.Frame(self.color_fondo, bg='#f0f0f0', width=300, height=560)
         self.fondo.pack(side='right', fill='both', expand = True)
         
 class IniciarSesioncomoAdministrador:
