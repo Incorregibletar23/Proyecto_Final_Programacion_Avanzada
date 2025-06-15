@@ -1108,7 +1108,7 @@ class Grafo:
             texto += f"\t\t{nodos[lista]}\t\t\t\t{texto_lista}\n"
         self.mostrar_matriz.insert(tk.END, texto)
         self.mostrar_matriz.config(state="disabled")
-    def gradatDFS(self, sala_origen,):
+    def gradatDFS(self):
         vertices = list(self.grafo.keys())
         n = len(vertices)
         indices = {nodos: i for i, nodos in enumerate(vertices)}
@@ -1276,7 +1276,7 @@ class IniciarSesioncomoUsuario:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.comandoTemporal_3
+            command=self.busCamDFS
         )
         self.botonRegresar = tk.Button(
             self.div_izq,
@@ -1346,9 +1346,86 @@ class IniciarSesioncomoUsuario:
         self.ventUs.destroy()
         VentanaPrincipal()
 
-    def comandoTemporal_3(self):
-        print('funcion')
-        
+    def busCamDFS(self):
+        self.limpiar()
+        #-----------MARCO DE ACCION PARA MANIPULAR EL GRAFO----------
+
+        self.marAccUsu = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAccUsu.pack(expand=True)
+
+        #-----------COSAS DE LA SUBVENTANA MARCOFORMULARIO----------
+        # Etiqueta Sala origen
+        self.etiqueta_cam_1 = tk.Label(
+            self.marAccUsu,
+            text=f"Ingresa el nombre de la sala de Origen",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.etiqueta_cam_2 = tk.Label(
+            self.marAccUsu,
+            text=f"Ingresa el nombre de la sala de Destino ",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entrada de nombre de sala
+        self.entrada_cam_1 = tk.Entry(
+            self.marAccUsu,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo
+            fg="#333333",           # Texto
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        self.entrada_cam_2 = tk.Entry(
+            self.marAccUsu,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo
+            fg="#333333",           # Texto
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Boton ingresar el camino
+        self.boton = tk.Button(
+            self.marAccUsu,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=23,                   # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.cap_datos
+        )
+        # Posiciones
+        self.etiqueta_cam_1.pack(pady=10)
+        self.entrada_cam_1.pack(pady=10)
+        self.etiqueta_cam_2.pack(pady=10)
+        self.entrada_cam_2.pack(pady=10)
+        self.boton.pack(pady=10)
     def divisiones_colores_ventUs(self):
         # #717d7e
         self.color_arriba = tk.Frame(self.ventUs, bg='#2c3e50', width=800, height=40)
@@ -1367,6 +1444,31 @@ class IniciarSesioncomoUsuario:
     
         self.fondo = tk.Frame(self.color_fondo, bg='#f0f0f0', width=300, height=560)
         self.fondo.pack(side='right', fill='both', expand = True)
+    def cap_datos(self):
+        # Capturar Datos
+        sala_origen = self.entrada_cam_1.get()
+        sala_destino = self.entrada_cam_2.get()
+        # DFS
+        if sala_origen in grafo.grafo and sala_destino in grafo.grafo:
+            matriz, indices, nodos = grafo.gradatDFS()
+            o = indices[sala_origen]
+            d = indices[sala_destino]
+            buscador = BusquedaDeCamino(matriz, o, d)
+            distancia, caminos = buscador.dfs()
+            if caminos:
+                caminos_nombre = []
+                # Traducir a nombres
+                for camino in caminos:
+                    camino_nombres = [nodos[i] for i in camino]
+                    caminos_nombre.append(" → ".join(camino_nombres))
+            # Texto mostrar
+                mostrar = f"Distancia mas corta: {distancia}, "
+                for i, cam in enumerate(caminos_nombre):
+                    mostrar += f"Camino {i}:{cam}\n"
+                    messagebox.showinfo('DFS correcto', mostrar)
+        else:
+            messagebox.showinfo('Sala inexistente', f'¡Una de las salas NO existe!, quizas escribiste mal')
+
         
 class IniciarSesioncomoAdministrador:
     def __init__(self):
@@ -2112,11 +2214,12 @@ class IniciarSesioncomoAdministrador:
                     camino_nombres = [nodos[i] for i in camino]
                     caminos_nombre.append(" → ".join(camino_nombres))
             # Texto mostrar
-                mostrar = f"Distancia mas corta {distancia}"
+                mostrar = f"Distancia mas corta: {distancia}, "
                 for i, cam in enumerate(caminos_nombre):
-                    salida += f"Camino {i}:{cam}\n"
-                
-                
+                    mostrar += f"Camino {i}:{cam}\n"
+                messagebox.showinfo('DFS correcto', mostrar)
+        else:
+            messagebox.showinfo('Sala inexistente', f'¡Una de las salas NO existe!, quizas escribiste mal')
        
 # 4.- ---------- Variables u objetos globales ----------
 class BusquedaDeCamino:
