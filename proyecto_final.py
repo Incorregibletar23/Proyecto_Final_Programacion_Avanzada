@@ -1,7 +1,7 @@
 # 1.- ---------- Encabezado ----------
 
 '''
-Programa: Proyecto Grafo - proyecto_grafo.py
+Programa: Proyecto Final - proyecto_final.py
 Autores:
 - Ramírez Vásquez Eduardo
 - Rosas López Renata
@@ -9,6 +9,7 @@ Fecha de creación: 15/06/2025
 Fechas de modificación:
     Eduardo:
         - 12/06/2025 10:13 am(v3.1: Se empezó a hacer el proyecto final incluyendo todos los temas vistos)
+        - 17/06/2025 12:38 pm(v3.1: Prueba 1 github)
 
     Renata:
 '''
