@@ -10,6 +10,8 @@ Fechas de modificación:
     Eduardo:
         - 12/06/2025 10:13 am(v3.1: Se empezó a hacer el proyecto final incluyendo todos los temas vistos)
         - 17/06/2025 12:38 pm(v3.1: Prueba 1 github)
+        - 17/06/2025 12:40 pm(v3.2: Se empezó a trabajar con la concurrencia ya que threads no permite cambios
+        en los gráficos en tiempo real)
 
     Renata:
 '''
@@ -28,6 +30,7 @@ from tkinter import messagebox
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import threading
 import random
+import queue
 
 # 3.- ---------- Definición de funciones o clases ----------
 
@@ -2075,50 +2078,53 @@ class IniciarSesioncomoAdministrador:
     def iniPru(self):
         PruebaPersonas()
 
+
 class PruebaPersonas:
     def __init__(self):
         self.venPru = tk.Tk()
         self.venPru.title('Prueba')
         self.venPru.geometry('800x600')
-        # Icono de la ventana
         self.venPru.iconbitmap('Logoadmin.ico')
-        # Función que dividirá la ventana hecha en 4
+        
+        # COLA (DEL PRODUCTOR)
+        # Esta parte es comunicación asíncrona de los hilos debido a que conforme pasan por una sala, el mapa
+        # actual de ese hilo se rompe y encola el mapa nuevo para que el hilo principal pueda modificar ese mapa
+        # en ese cuadrante
+        self.colaCamMap = queue.Queue()
+        # Funciones para modificar los mapas
         self.hilos()
+        
+        self.venPru.after(100, self.revSiHayMapNue)
     def hilos(self):
-        # Cuadrantes de la venatana
         self.hilo1 = tk.Frame(self.venPru, bg='#f0f0f0')
         self.hilo1.grid(row=0, column=0, sticky='nsew')
-
         self.hilo2 = tk.Frame(self.venPru, bg='#f1f1f1')
         self.hilo2.grid(row=0, column=1, sticky='nsew')
-
         self.hilo3 = tk.Frame(self.venPru, bg='#f1f1f1')
         self.hilo3.grid(row=1, column=0, sticky='nsew')
-
         self.hilo4 = tk.Frame(self.venPru, bg='#f0f0f0')
         self.hilo4.grid(row=1, column=1, sticky='nsew')
-
+        # Posiciones de los cuadrantes (cada uno es un hilo)
         self.venPru.grid_rowconfigure(0, weight=1)
         self.venPru.grid_rowconfigure(1, weight=1)
         self.venPru.grid_columnconfigure(0, weight=1)
         self.venPru.grid_columnconfigure(1, weight=1)
+        # Asignarle un hilo a cada cuadrante
         self.simHil()
     def simHil(self):
-      hilos = []
-      cuadrantes = [self.hilo1, self.hilo2, self.hilo3, self.hilo4]
-      for hilo in range(4):
-        h = threading.Thread(target=self.simPer, args=(cuadrantes[hilo], hilo))
-        h.daemon = True
-        h.start()
-        hilos.append(h)
+        cuadrantes = [self.hilo1, self.hilo2, self.hilo3, self.hilo4]
+        for hilo in range(4):
+            h = threading.Thread(target=self.simPer, args=(cuadrantes[hilo], hilo))
+            h.daemon = True
+            h.start()
     def simPer(self, cuadrante, persona):
-        # Obtener la lista matriz de adyacencia, el lugar que tiene cada sitio en la matriz y las salas que hay
+        # Con la función que ya teníamos de grafos obendremos: la matriz de adyacencia, el la posición de cada sala en el diccionario grafo y las salas que tiene el mismo diccionario
         matriz, lugar, nodos = grafo.gradatDFS()
-        # Hacer una lista de nodos
+        # Hacer una lista de las salas
         listaNodos = list(lugar.keys())
         origen = random.choice(listaNodos)
         destino = random.choice(listaNodos)
-        # Comprobar que origen y destino no sea el mismo
+        # Comprobar que origen y destino no sean los mismos
         while True:
           if origen == destino:
             destino = random.choice(listaNodos)
@@ -2129,25 +2135,37 @@ class PruebaPersonas:
         buscar = BusquedaDeCamino(matriz, ori, des)
         distancia, caminos = buscar.dfs()
         if not caminos:
-          messagebox.showinfo('¡Sin Caminos!', f'No hay camino posible de {origen} a {destino}')
-          return
-        # Si hay varios caminos, elegir el primero de la lista
+            messagebox.showinfo('¡Sin Caminos!', f'No hay camino posible de {origen} a {destino}')
+            return
+        # Si hay varios caminos con la misma distancia, elegir el primero de la lista
         camino = caminos[0]
-        for i in range (len(camino)):
-          subcamino = camino[:i+1]
-          salas = [nodos[j] for j in subcamino]
-          self.mapPer(cuadrante, salas)
-          time.sleep(2)
-    def mapPer(self, cuadrante, visitados):
+        visitados = []
+        for i in range(len(camino)):
+            salaActual = nodos[camino[i]]
+            visitados.append(salaActual)
+            self.colaCamMap.put((cuadrante, visitados.copy()))
+            time.sleep(2)
+    # Función consumidor: Esta función espera a que la cola que da el productor esté dando elementos nuevos para hacer cambio a los cuadrantes
+    def revSiHayMapNue(self):
+        try:
+            while True:
+                cuadrante, visitados = self.colaCamMap.get(block = False)
+                self.mapPer(cuadrante, visitados)
+        except queue.Empty:
+            pass
+        # Concurrencia: cada 100 milisegundos se revisará de nuevo si la cola está vacía o no para cambiar los mapas
+        self.venPru.after(100, self.revSiHayMapNue)
+    def mapPer(self, cuadrante, salas_visitadas):
         Grafo = nx.DiGraph()
         for origen, salas in grafo.grafo.items():
-          for destino, distancia in salas.lista_de_aristas():
-            Grafo.add_edge(origen, destino, weight=distancia)
+            for destino, distancia in salas.lista_de_aristas():
+                Grafo.add_edge(origen, destino, weight=distancia)
+
         figura = plt.Figure()
-        ax = figura.add_subplot(1,1,1)
+        ax = figura.add_subplot(1, 1, 1)
         pos = nx.spring_layout(Grafo)
 
-        colores = ['#62bbcf' if nodo in visitados else '#b7bedb' for nodo in Grafo.nodes]
+        colores = ['#62bbcf' if nodo in salas_visitadas else '#b7bedb' for nodo in Grafo.nodes]
 
         nx.draw(Grafo, pos, ax=ax,
                 with_labels=True,
@@ -2157,6 +2175,7 @@ class PruebaPersonas:
                 font_size=6,
                 edge_color='gray',
                 font_color='#212b6a')
+
         nx.draw_networkx_edge_labels(Grafo, pos, ax=ax,
                 edge_labels=nx.get_edge_attributes(Grafo, 'weight'),
                 font_size=8)
@@ -2167,7 +2186,7 @@ class PruebaPersonas:
         canvas = FigureCanvasTkAgg(figura, master=cuadrante)
         canvas.draw()
         canvas.get_tk_widget().pack(expand=True, fill="both")
-          
+        
 class BusquedaDeCamino:
     def __init__(self, matriz, origen, destino):
         self.matriz = matriz
@@ -2246,13 +2265,29 @@ if __name__ == '__main__':
 Búsqueda de información:
     - Chatgpt:
         + En thread, "daemon" es un tipo de hilo que se ejecuta sin estorbar al hilo principal, lo usamos porque
-        este tipo de hilo no afecta al main, por lo que si cierro la ejecución el programa no se bloquea
+        este tipo de hilo no afecta al main, por lo que si cierro la ejecución el programa prueba no se bloquea
         + con grid_algoconfigure es una función de tkinter que configura las filas y columnas (en este caso con-
         figuramos 2 columnas y 2 filas por cada una de ellas, y para ello les asignamos el numero 0 y 1 para di-
         ferenciarlas)
         + choice es una funcion de random que elige un elemento al azar de una lista
+        + No puedes modificar tkinter desde los hilos, python no lo permite, por lo que dará error al intentar
+        modificar el mapa para las pruebas de personas, la solución que utilizamos fue usar comunicación asín-
+        crona para hacer una cola que use el productor que va a usar el DFS para marcar el camino que lleva la
+        persona de prueba y el hulo principal checará esa cola constantemente para saber si algún cuadrante ne-
+        cesitará ser destruido y vuelto a crear para trazar la ruta actual
+        + Para hacer que el hilo principal modificara a los cuadrantes de los mapas necesitabamos una función
+        que revisara, y vimos que la función widget.after(tiempo, función, argumentos) sirve para hacer que el
+        hilo principal que es el de las ventanas, checara cada 100 milisegundos si la función dfs tenía un nuevo
+        mapa para actualizarlo en los cuadrantes, y en este caso no necesitaba argumentos, solo el tiempo y el
+        objeto que iba a estar revisando.
+        + La Clase Queue en el metodo get() bloquea la interfaz por defecto si la cola está vacía, pero tiene un
+        método diseñado para concurrencia que es el que utulizamos: .get(block = False), que significa que la
+        iinterfáz gráfica no se bloquea si la cola está vacía, por lo tanto aunque se acaben las actualizaciones
+        seguirá funcionando y por lo tanto podremos seguir utilizando el programa
     - Código del profesor y clasroom de la materia:
         + Esqueleto del código
         + Menú
+        + Teoría sobre la concurrencia
+        + Si el código 
     - Formado a partir del proyecto de grafo
 '''
