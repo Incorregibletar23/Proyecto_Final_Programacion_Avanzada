@@ -25,6 +25,8 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 from tkinter import messagebox
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import threading
+import random
 
 # 3.- ---------- Definición de funciones o clases ----------
 
@@ -33,6 +35,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 class Nodo:
   def __init__(self, dato):
     self.dato = dato
+    self.visitados = [0,0,0,0,0,0,0,0,0,0,0,0]
     self.izquierda = None
     self.derecha = None
 
@@ -836,7 +839,18 @@ class Grafo:
             texto += f"\t\t{nodos[lista]}\t\t\t\t{texto_lista}\n"
         self.mostrar_matriz.insert(tk.END, texto)
         self.mostrar_matriz.config(state="disabled")
-
+    def gradatDFS(self):
+        vertices = list(self.grafo.keys())
+        n = len(vertices)
+        indices = {nodos: i for i, nodos in enumerate(vertices)}
+        matriz = [[0] * n for _ in range(n)]
+        for vertice, lista in self.grafo.items():
+            origenind = indices[vertice]
+            aristas = lista.listnommat("DFS")
+            for destino,peso in aristas:
+                destinoind = indices[destino]
+                matriz[origenind][destinoind] = int(peso)
+        return matriz, indices, vertices
                 
 #-----------CLASES DE LA INTERFAZ----------
 
@@ -963,7 +977,7 @@ class ChecarID:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.cP
+            command=self.escribirID
         )
         self.etiquetaTitulo = tk.Label(
             self.venChe,
@@ -991,7 +1005,7 @@ class ChecarID:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.cP
+            command=self.crearID
         )
         # Posiciones
         self.etiquetaEspacio10.pack(pady=45)
@@ -1001,11 +1015,27 @@ class ChecarID:
         self.etiquetaEspacio11.pack(pady=7)
         self.etiquetaTitulo.pack(pady=5)
         self.botonCreID.pack(pady=5)
-    def cP(self):
-        print(1)
+    def escribirID(self):
+        idEscrito = self.entradaID.get()
+        self.venChe.destroy()
+        IniciarSesioncomoUsuario(idEscrito)
+    def crearID(self):
+        global idCreado
+        global arbolID
+        if len(str(idCreado)) == 1:
+          inicial = 20250
+          self.ID = str(inicial) + str(idCreado)
+        elif len(str(idCreado)) == 2:
+          inicial = 2025
+          self.ID = str(inicial) + str(idCreado)
+        arbolID.insertar(self.ID)
+        self.venChe.destroy()
+        IniciarSesioncomoUsuario(self.ID)
+        idCreado += 1
 
 class IniciarSesioncomoUsuario:
-    def __init__(self):
+    def __init__(self, usuario):
+        self.idUsuario = usuario
         self.ventUs = tk.Tk()
         self.ventUs.title('Usuario')
         self.ventUs.geometry('800x600+300+0')
@@ -1069,7 +1099,7 @@ class IniciarSesioncomoUsuario:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.comandoTemporal_3
+            command=self.ingdatDFS_
         )
         self.botonRegresar = tk.Button(
             self.div_izq,
@@ -1138,15 +1168,25 @@ class IniciarSesioncomoUsuario:
     def regresar(self):
         self.ventUs.destroy()
         VentanaPrincipal()
-
-    def comandoTemporal_3(self):
-        print('funcion')
         
     def divisiones_colores_ventUs(self):
         # #717d7e
         self.color_arriba = tk.Frame(self.ventUs, bg='#2c3e50', width=800, height=40)
         self.color_arriba.pack(side='top', fill='x')
-
+        self.etiquetaID = tk.Label(
+            self.color_arriba,
+            text= f"Usuario: {self.idUsuario}", # Texto que muestra la etiqueta
+            font=("Century Gothic", 15, 'bold'),# Fuente, tamaño y estilo (negrita)
+            fg="white",                         # Color del texto
+            bg="#2c3e50",                       # Color del fondo de la etiqueta
+            width=30,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=1,                             # Espacio interno horizontal
+            pady=8                              # Espacio interno vertical
+        )
+        self.etiquetaID.pack()
         # Color crema (resto: 560px)
         self.color_fondo= tk.Frame(self.ventUs, bg='#f4f6f7', width=800)
         self.color_fondo.pack(side='top', fill='both', expand = True)
@@ -1160,6 +1200,110 @@ class IniciarSesioncomoUsuario:
     
         self.fondo = tk.Frame(self.color_fondo, bg='#f0f0f0', width=300, height=560)
         self.fondo.pack(side='right', fill='both', expand = True)
+    def ingdatDFS_(self):
+        self.limpiar()
+        #-----------MARCO DE ACCION PARA MANIPULAR EL GRAFO----------
+
+        self.marAccUsu = tk.Frame(self.fondo, bg="#f0f0f0")
+        self.marAccUsu.pack(expand=True)
+
+        #-----------COSAS DE LA SUBVENTANA MARCOFORMULARIO----------
+        # Etiqueta Sala origen
+        self.etiqueta_cam_1 = tk.Label(
+            self.marAccUsu,
+            text=f"Ingresa el nombre de la sala de Origen",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.etiqueta_cam_2 = tk.Label(
+            self.marAccUsu,
+            text=f"Ingresa el nombre de la sala de Destino ",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entrada de nombre de sala
+        self.entrada_cam_1 = tk.Entry(
+            self.marAccUsu,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo
+            fg="#333333",           # Texto
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        self.entrada_cam_2 = tk.Entry(
+            self.marAccUsu,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo
+            fg="#333333",           # Texto
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Boton ingresar el camino
+        self.boton = tk.Button(
+            self.marAccUsu,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=23,                   # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.cap_datos
+        )
+        # Posiciones
+        self.etiqueta_cam_1.pack(pady=10)
+        self.entrada_cam_1.pack(pady=10)
+        self.etiqueta_cam_2.pack(pady=10)
+        self.entrada_cam_2.pack(pady=10)
+        self.boton.pack(pady=10)
+    def cap_datos(self):
+        # Capturar Datos
+        sala_origen = self.entrada_cam_1.get()
+        sala_destino = self.entrada_cam_2.get()
+        # DFS
+        if sala_origen in grafo.grafo and sala_destino in grafo.grafo:
+            matriz, indices, nodos = grafo.gradatDFS()
+            o = indices[sala_origen]
+            d = indices[sala_destino]
+            buscador = BusquedaDeCamino(matriz, o, d)
+            distancia, caminos = buscador.dfs()
+            if caminos:
+                caminos_nombre = []
+                # Traducir a nombres
+                for camino in caminos:
+                    camino_nombres = [nodos[i] for i in camino]
+                    caminos_nombre.append(" → ".join(camino_nombres))
+            # Texto mostrar
+                mostrar = f"Distancia mas corta: {distancia}, "
+                for i, cam in enumerate(caminos_nombre):
+                    mostrar += f"Camino {i}:{cam}\n"
+                    messagebox.showinfo('DFS correcto', mostrar)
+        else:
+            messagebox.showinfo('Sala inexistente', f'¡Una de las salas NO existe!, quizas escribiste mal')
         
 class IniciarSesioncomoAdministrador:
     def __init__(self):
@@ -1361,18 +1505,33 @@ class IniciarSesioncomoAdministrador:
         )
         self.botonBuscar = tk.Button(
             self.menu,
-            text='Buscar',
+            text=' DFS ',
             font=("Century Gothic", 10),
             bg="#abaeb8",              # Fondo
             fg="black",                # Color del texto
             activebackground="#4b5572",# Fondo al presionar
             activeforeground="white",  # Color del texto al presionar
-            padx=36,                   # Espacio horizontal interno
+            padx=39,                   # Espacio horizontal interno
             pady=2,                    # Espacio vertical interno
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.regresar
+            command=self.ingdatDFS_
+        )
+        self.botonPru = tk.Button(
+            self.menu,
+            text=' Iniciar Prueba ',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=13,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.iniPru
         )
         self.botonReg = tk.Button(
             self.menu,
@@ -1390,13 +1549,14 @@ class IniciarSesioncomoAdministrador:
             command=lambda:self.regresar_vent_prin()
         )
         # Posiciones
-        self.etiquetaEspacio7.pack(pady = 26)
+        self.etiquetaEspacio7.pack(pady = 13)
         self.botonAgregarSal.pack(pady = 10)
         self.botonAgregarCam.pack(pady = 10)
         self.botonEliminarSal.pack(pady = 10)
         self.botonEliminarCam.pack(pady = 10)
         self.botonMostrar.pack(pady = 10)
         self.botonBuscar.pack(pady = 10)
+        self.botonPru.pack(pady = 10)
         self.botonReg.pack(pady = 10)
 
         #-----------COSAS DE LA SUBVENTANA ADMINISTRADOR(IMAGEN)----------
@@ -1807,8 +1967,236 @@ class IniciarSesioncomoAdministrador:
         self.marAcc.pack(expand=True)
         # Funcion
         grafo.most_mat_ady(self.marAcc)
+    def ingdatDFS_(self):
+        self.limpiarImagen()
+        #-----------MARCO DE ACCION PARA MANIPULAR EL GRAFO----------
+
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+
+        #-----------COSAS DE LA SUBVENTANA MARCOFORMULARIO----------
+        # Etiqueta Sala origen
+        self.etiqueta_cam_1 = tk.Label(
+            self.marAcc,
+            text=f"Ingresa el nombre de la sala de Origen",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        self.etiqueta_cam_2 = tk.Label(
+            self.marAcc,
+            text=f"Ingresa el nombre de la sala de Destino ",# Texto que muestra la etiqueta
+            font=("Century Gothic", 12, "bold"),# Fuente, tamaño y estilo (negrita)
+            fg="black",                         # Color del texto
+            bg="#f0f0f0",                       # Color del fondo de la etiqueta
+            width=45,                           # Ancho de la etiqueta (en caracteres aprox.)
+            anchor="center",                    # Posición del texto dentro de la etiqueta
+            relief="flat",                      # Tipo de borde (puede ser flat, raised, sunken, ridge, groove, solid)
+            bd=2,                               # Grosor del borde
+            padx=10,                            # Espacio interno horizontal
+            pady=5                              # Espacio interno vertical
+        )
+        # Entrada de nombre de sala
+        self.entrada_cam_1 = tk.Entry(
+            self.marAcc,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo
+            fg="#333333",           # Texto
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        self.entrada_cam_2 = tk.Entry(
+            self.marAcc,
+            font=("Century Gothic", 12),
+            bg="#ffffff",           # Fondo
+            fg="#333333",           # Texto
+            bd=2,                   # Grosor del borde
+            relief="groove",        # Estilo del borde
+            width=30,               # Ancho en caracteres
+            justify="center",       # Texto centrado
+            insertbackground="black"# Color del cursor
+        )
+        # Boton ingresar el camino
+        self.boton = tk.Button(
+            self.marAcc,
+            text='Ingresar',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=23,                   # Espacio horizontal interno
+            pady=3,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.cap_datos
+        )
+        # Posiciones
+        self.etiqueta_cam_1.pack(pady=10)
+        self.entrada_cam_1.pack(pady=10)
+        self.etiqueta_cam_2.pack(pady=10)
+        self.entrada_cam_2.pack(pady=10)
+        self.boton.pack(pady=10)
+    def cap_datos(self):
+        # Capturar Datos
+        sala_origen = self.entrada_cam_1.get()
+        sala_destino = self.entrada_cam_2.get()
+        # DFS
+        if sala_origen in grafo.grafo and sala_destino in grafo.grafo:
+            matriz, indices, nodos = grafo.gradatDFS()
+            o = indices[sala_origen]
+            d = indices[sala_destino]
+            buscador = BusquedaDeCamino(matriz, o, d)
+            distancia, caminos = buscador.dfs()
+            if caminos:
+                caminos_nombre = []
+                # Traducir a nombres
+                for camino in caminos:
+                    camino_nombres = [nodos[i] for i in camino]
+                    caminos_nombre.append(" → ".join(camino_nombres))
+            # Texto mostrar
+                mostrar = f"Distancia mas corta: {distancia}, "
+                for i, cam in enumerate(caminos_nombre):
+                    mostrar += f"Camino {i}:{cam}\n"
+                    messagebox.showinfo('DFS correcto', mostrar)
+        else:
+            messagebox.showinfo('Sala inexistente', f'¡Una de las salas NO existe!, quizas escribiste mal')
+    def iniPru(self):
+        PruebaPersonas()
+
+class PruebaPersonas:
+    def __init__(self):
+        self.venPru = tk.Tk()
+        self.venPru.title('Prueba')
+        self.venPru.geometry('800x600')
+        # Icono de la ventana
+        self.venPru.iconbitmap('Logoadmin.ico')
+        # Función que dividirá la ventana hecha en 4
+        self.hilos()
+    def hilos(self):
+        # Cuadrantes de la venatana
+        self.hilo1 = tk.Frame(self.venPru, bg='#f0f0f0')
+        self.hilo1.grid(row=0, column=0, sticky='nsew')
+
+        self.hilo2 = tk.Frame(self.venPru, bg='#f1f1f1')
+        self.hilo2.grid(row=0, column=1, sticky='nsew')
+
+        self.hilo3 = tk.Frame(self.venPru, bg='#f1f1f1')
+        self.hilo3.grid(row=1, column=0, sticky='nsew')
+
+        self.hilo4 = tk.Frame(self.venPru, bg='#f0f0f0')
+        self.hilo4.grid(row=1, column=1, sticky='nsew')
+
+        self.venPru.grid_rowconfigure(0, weight=1)
+        self.venPru.grid_rowconfigure(1, weight=1)
+        self.venPru.grid_columnconfigure(0, weight=1)
+        self.venPru.grid_columnconfigure(1, weight=1)
+        self.simHil()
+    def simHil(self):
+      hilos = []
+      cuadrantes = [self.hilo1, self.hilo2, self.hilo3, self.hilo4]
+      for hilo in range(4):
+        h = threading.Thread(target=self.simPer, args=(cuadrantes[hilo], hilo))
+        h.daemon = True
+        h.start()
+        hilos.append(h)
+    def simPer(self, cuadrante, persona):
+        # Obtener la lista matriz de adyacencia, el lugar que tiene cada sitio en la matriz y las salas que hay
+        matriz, lugar, nodos = grafo.gradatDFS()
+        # Hacer una lista de nodos
+        listaNodos = list(lugar.keys())
+        origen = random.choice(listaNodos)
+        destino = random.choice(listaNodos)
+        # Comprobar que origen y destino no sea el mismo
+        while True:
+          if origen == destino:
+            destino = random.choice(listaNodos)
+          if origen != destino:
+            break
+        ori = lugar[origen]
+        des = lugar[destino]
+        buscar = BusquedaDeCamino(matriz, ori, des)
+        distancia, caminos = buscar.dfs()
+        if not caminos:
+          messagebox.showinfo('¡Sin Caminos!', f'No hay camino posible de {origen} a {destino}')
+          return
+        # Si hay varios caminos, elegir el primero de la lista
+        camino = caminos[0]
+        for i in range (len(camino)):
+          subcamino = camino[:i+1]
+          salas = [nodos[j] for j in subcamino]
+          self.mapPer(cuadrante, salas)
+          time.sleep(2)
+    def mapPer(self, cuadrante, visitados):
+        Grafo = nx.DiGraph()
+        for origen, salas in grafo.grafo.items():
+          for destino, distancia in salas.lista_de_aristas():
+            Grafo.add_edge(origen, destino, weight=distancia)
+        figura = plt.Figure()
+        ax = figura.add_subplot(1,1,1)
+        pos = nx.spring_layout(Grafo)
+
+        colores = ['#62bbcf' if nodo in visitados else '#b7bedb' for nodo in Grafo.nodes]
+
+        nx.draw(Grafo, pos, ax=ax,
+                with_labels=True,
+                node_color=colores,
+                node_shape='s',
+                node_size=800,
+                font_size=6,
+                edge_color='gray',
+                font_color='#212b6a')
+        nx.draw_networkx_edge_labels(Grafo, pos, ax=ax,
+                edge_labels=nx.get_edge_attributes(Grafo, 'weight'),
+                font_size=8)
+
+        for widget in cuadrante.winfo_children():
+            widget.destroy()
+
+        canvas = FigureCanvasTkAgg(figura, master=cuadrante)
+        canvas.draw()
+        canvas.get_tk_widget().pack(expand=True, fill="both")
+          
+class BusquedaDeCamino:
+    def __init__(self, matriz, origen, destino):
+        self.matriz = matriz
+        self.origen = origen
+        self.destino = destino
+        self.caminos = []
+    def recursividad(self, actual, camino, distancia):
+        if actual == self.destino:
+            self.caminos.append((camino, distancia))
+            return
+        for s, d in enumerate(self.matriz[actual]):
+            if d != 0 and s not in camino:
+                self.recursividad(s, camino + [s], distancia + d)
+    def dfs(self):
+        self.recursividad(self.origen, [self.origen], 0)
+        if not self.caminos:
+            return None, []
+        else:
+            distanciaminima = self.caminos[0][1]
+            for _, d in self.caminos[1:]:
+                if d < distanciaminima:
+                    distanciaminima = d
+            caminosminimos = [i for i, d in self.caminos if d == distanciaminima]
+            return distanciaminima, caminosminimos
 
 # 4.- ---------- Variables u objetos globales ----------
+
+# ID's creados
+
+idCreado = 5
 
 # Grafo
 grafo = Grafo()
@@ -1844,6 +2232,9 @@ arbolID.insertar("202502")
 arbolID.insertar("202503")
 arbolID.insertar("202504")
 
+# Salas
+salas = {0: "Arte Prehispánico",1: "Arte Contemporáneo",2: "Escultura",3: "Pintura Europea",4: "Fotografía",5: "Arte Moderno",6: "Arte Oriental",7: "Arte Popular Mexicano",8: "Historia Natural",9: "Virreinato",10: "Revolución",11: "Ciencias y Tecnología"}
+
 # 5.- ---------- Bloque Principal ----------
 if __name__ == '__main__':
     aplicacionGrafo = VentanaPrincipal()
@@ -1853,6 +2244,12 @@ if __name__ == '__main__':
 '''
 Búsqueda de información:
     - Chatgpt:
+        + En thread, "daemon" es un tipo de hilo que se ejecuta sin estorbar al hilo principal, lo usamos porque
+        este tipo de hilo no afecta al main, por lo que si cierro la ejecución el programa no se bloquea
+        + con grid_algoconfigure es una función de tkinter que configura las filas y columnas (en este caso con-
+        figuramos 2 columnas y 2 filas por cada una de ellas, y para ello les asignamos el numero 0 y 1 para di-
+        ferenciarlas)
+        + choice es una funcion de random que elige un elemento al azar de una lista
     - Código del profesor y clasroom de la materia:
         + Esqueleto del código
         + Menú
