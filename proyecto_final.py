@@ -2196,6 +2196,8 @@ class PruebaPersonas:
                 colores.append('#62bbcf')   # azul para camino recorrido
             else:
                 colores.append('#b7bedb')   # gris para no visitados
+        print(visitas)
+        #print(salas)
         for sala1 in salas_visitadas:
           for posicion, sala2 in salas.items():
             if sala2 == sala1:
