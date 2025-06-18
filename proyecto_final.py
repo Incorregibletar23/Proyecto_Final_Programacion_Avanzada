@@ -12,6 +12,7 @@ Fechas de modificación:
         - 17/06/2025 12:38 pm(v3.1: Prueba 1 github)
         - 17/06/2025 12:40 pm(v3.2: Se empezó a trabajar con la concurrencia ya que threads no permite cambios
         en los gráficos en tiempo real)
+        - 18/06/2025 12:25 pm(v3.4: 
 
     Renata:
 '''
@@ -1927,12 +1928,28 @@ class IniciarSesioncomoAdministrador:
             cursor="hand2",            # Cambia a manita
             command=self.mosMap
         )
+        self.botonEstadi = tk.Button(
+            self.marAcc,
+            text='Estadísticas',
+            font=("Century Gothic", 10),
+            bg="#abaeb8",              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#4b5572",# Fondo al presionar
+            activeforeground="white",  # Color del texto al presionar
+            padx=32,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.mosMap
+        )
         # Posiciones
         self.etiquetaMostrar.pack(pady = 10)
         self.botonMosSal.pack(pady = 10)
         self.botonMosLisSal.pack(pady = 10)
         self.botonMosMatAdy.pack(pady = 10)
-        self.botonMosMap.pack(pady = 10)
+        self.botonMosMap.pack()
+        self.botonEstadi.pack()
     def mostrarSal(self):
         self.limpiarImagen()
         # Hacer de nuevo el contenedor temporal
@@ -2071,8 +2088,8 @@ class IniciarSesioncomoAdministrador:
             # Texto mostrar
                 mostrar = f"Distancia mas corta: {distancia}, "
                 for i, cam in enumerate(caminos_nombre):
-                    mostrar += f"Camino {i}:{cam}\n"
-                    messagebox.showinfo('DFS correcto', mostrar)
+                    mostrar += f"Camino {i+1}:{cam}\n"
+                messagebox.showinfo('DFS correcto', mostrar)
         else:
             messagebox.showinfo('Sala inexistente', f'¡Una de las salas NO existe!, quizas escribiste mal')
     def iniPru(self):
@@ -2085,7 +2102,6 @@ class PruebaPersonas:
         self.venPru.title('Prueba')
         self.venPru.geometry('800x600')
         self.venPru.iconbitmap('Logoadmin.ico')
-        
         # COLA (DEL PRODUCTOR)
         # Esta parte es comunicación asíncrona de los hilos debido a que conforme pasan por una sala, el mapa
         # actual de ese hilo se rompe y encola el mapa nuevo para que el hilo principal pueda modificar ese mapa
@@ -2093,7 +2109,7 @@ class PruebaPersonas:
         self.colaCamMap = queue.Queue()
         # Funciones para modificar los mapas
         self.hilos()
-        
+        # Función que revisa la cola cada 100 milisegundos
         self.venPru.after(100, self.revSiHayMapNue)
     def hilos(self):
         self.hilo1 = tk.Frame(self.venPru, bg='#f0f0f0')
@@ -2117,8 +2133,9 @@ class PruebaPersonas:
             h = threading.Thread(target=self.simPer, args=(cuadrantes[hilo], hilo))
             h.daemon = True
             h.start()
+    # Función consumidor: esta función agrega a la cola colaCamMap los nuevos cuadrantes que hay que ir haciendo para que los utilice el consumidor
     def simPer(self, cuadrante, persona):
-        # Con la función que ya teníamos de grafos obendremos: la matriz de adyacencia, el la posición de cada sala en el diccionario grafo y las salas que tiene el mismo diccionario
+        # Con la función que ya teníamos de grafos obendremos: la matriz de adyacencia, cada sala en el diccionario grafo y su posición, y las salas que tiene el mismo diccionario
         matriz, lugar, nodos = grafo.gradatDFS()
         # Hacer una lista de las salas
         listaNodos = list(lugar.keys())
@@ -2134,6 +2151,7 @@ class PruebaPersonas:
         des = lugar[destino]
         buscar = BusquedaDeCamino(matriz, ori, des)
         distancia, caminos = buscar.dfs()
+        # Revisa si la lista de caminos tiene algo
         if not caminos:
             messagebox.showinfo('¡Sin Caminos!', f'No hay camino posible de {origen} a {destino}')
             return
@@ -2144,7 +2162,7 @@ class PruebaPersonas:
             salaActual = nodos[camino[i]]
             visitados.append(salaActual)
             self.colaCamMap.put((cuadrante, visitados.copy()))
-            time.sleep(2)
+            time.sleep(4)
     # Función consumidor: Esta función espera a que la cola que da el productor esté dando elementos nuevos para hacer cambio a los cuadrantes
     def revSiHayMapNue(self):
         try:
@@ -2156,18 +2174,34 @@ class PruebaPersonas:
         # Concurrencia: cada 100 milisegundos se revisará de nuevo si la cola está vacía o no para cambiar los mapas
         self.venPru.after(100, self.revSiHayMapNue)
     def mapPer(self, cuadrante, salas_visitadas):
+        global visitas
+        global salas
         Grafo = nx.DiGraph()
-        for origen, salas in grafo.grafo.items():
-            for destino, distancia in salas.lista_de_aristas():
+        # Crear el Grafo
+        for origen, salas1 in grafo.grafo.items():
+            for destino, distancia in salas1.lista_de_aristas():
                 Grafo.add_edge(origen, destino, weight=distancia)
-
         figura = plt.Figure()
-        ax = figura.add_subplot(1, 1, 1)
+        eje = figura.add_subplot(1, 1, 1)
         pos = nx.spring_layout(Grafo)
 
-        colores = ['#62bbcf' if nodo in salas_visitadas else '#b7bedb' for nodo in Grafo.nodes]
-
-        nx.draw(Grafo, pos, ax=ax,
+        colores = []
+        for nodo in Grafo.nodes:
+            if nodo == salas_visitadas[0]:  # nodo origen
+                colores.append('#70f475')   # naranja rojizo
+            elif nodo == salas_visitadas[-1]:  # nodo destino
+                colores.append('#ff4d4d')   # rojo más intenso
+            elif nodo in salas_visitadas:
+                colores.append('#62bbcf')   # azul para camino recorrido
+            else:
+                colores.append('#b7bedb')   # gris para no visitados
+        for sala1 in salas_visitadas:
+          for posicion, sala2 in salas.items():
+            if sala2 == sala1:
+              visitas[posicion] += 1
+        print(salas)
+        print(visitas)
+        nx.draw(Grafo, pos, ax=eje,
                 with_labels=True,
                 node_color=colores,
                 node_shape='s',
@@ -2176,7 +2210,7 @@ class PruebaPersonas:
                 edge_color='gray',
                 font_color='#212b6a')
 
-        nx.draw_networkx_edge_labels(Grafo, pos, ax=ax,
+        nx.draw_networkx_edge_labels(Grafo, pos, ax=eje,
                 edge_labels=nx.get_edge_attributes(Grafo, 'weight'),
                 font_size=8)
 
@@ -2215,7 +2249,6 @@ class BusquedaDeCamino:
 # 4.- ---------- Variables u objetos globales ----------
 
 # ID's creados
-
 idCreado = 5
 
 # Grafo
@@ -2254,6 +2287,8 @@ arbolID.insertar("202504")
 
 # Salas
 salas = {0: "Arte Prehispánico",1: "Arte Contemporáneo",2: "Escultura",3: "Pintura Europea",4: "Fotografía",5: "Arte Moderno",6: "Arte Oriental",7: "Arte Popular Mexicano",8: "Historia Natural",9: "Virreinato",10: "Revolución",11: "Ciencias y Tecnología"}
+# Visitas
+visitas = [0,0,0,0,0,0,0,0,0,0,0,0]
 
 # 5.- ---------- Bloque Principal ----------
 if __name__ == '__main__':
@@ -2284,6 +2319,8 @@ Búsqueda de información:
         método diseñado para concurrencia que es el que utulizamos: .get(block = False), que significa que la
         iinterfáz gráfica no se bloquea si la cola está vacía, por lo tanto aunque se acaben las actualizaciones
         seguirá funcionando y por lo tanto podremos seguir utilizando el programa
+        + lista.copy es una función de las listas que permite hacer una lista completamente nueva que puedas mo-
+        dificar sin afectar a la lisra otiginal
     - Código del profesor y clasroom de la materia:
         + Esqueleto del código
         + Menú
