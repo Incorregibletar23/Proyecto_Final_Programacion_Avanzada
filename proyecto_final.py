@@ -1941,15 +1941,15 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.mosMap
+            command=self.mosEst
         )
         # Posiciones
         self.etiquetaMostrar.pack(pady = 10)
         self.botonMosSal.pack(pady = 10)
         self.botonMosLisSal.pack(pady = 10)
         self.botonMosMatAdy.pack(pady = 10)
-        self.botonMosMap.pack()
-        self.botonEstadi.pack()
+        self.botonMosMap.pack(pady = 10)
+        self.botonEstadi.pack(pady = 10)
     def mostrarSal(self):
         self.limpiarImagen()
         # Hacer de nuevo el contenedor temporal
@@ -1971,6 +1971,11 @@ class IniciarSesioncomoAdministrador:
         self.marAcc.pack(expand=True)
         # Funcion
         grafo.mostrarMapa(self.marAcc)
+    def mosEst(self):
+        global visitas
+        global salas
+        self.cadSal = " "
+        
     def mostrar_salas(self):
         self.limpiarImagen()
         # Hacer de nuevo el contenedor temporal
@@ -2184,39 +2189,36 @@ class PruebaPersonas:
         figura = plt.Figure()
         eje = figura.add_subplot(1, 1, 1)
         pos = nx.spring_layout(Grafo)
-
+        # Hacer una lista que tenga en orden los colores que va a llevar cada nodo en el grafo
         colores = []
         for nodo in Grafo.nodes:
-            if nodo == salas_visitadas[0]:  # nodo origen
-                colores.append('#70f475')   # naranja rojizo
-            elif nodo == salas_visitadas[-1]:  # nodo destino
-                colores.append('#ff4d4d')   # rojo más intenso
-            elif nodo in salas_visitadas:
-                colores.append('#62bbcf')   # azul para camino recorrido
-            else:
-                colores.append('#b7bedb')   # gris para no visitados
+            if nodo == salas_visitadas[0]:    # Sala de origen
+                colores.append('#70f475')   
+            elif nodo == salas_visitadas[-1]: # Sala destino
+                colores.append('#ff4d4d')     
+            elif nodo in salas_visitadas:     # Las demás salas que no sean ni origen ni destino
+                colores.append('#62bbcf')     
+            else:                             # Todas las demás salas del grafo se pintarán de color gris
+                colores.append('#b7bedb')
+        # Estructura que aumentará en uno cada que pase por ahí una persona con el dfs, de esta manera se lleva a cabo la contabilidad de la estadística
         for sala1 in salas_visitadas:
           for posicion, sala2 in salas.items():
             if sala2 == sala1:
               visitas[posicion] += 1
-        print(salas)
-        print(visitas)
         nx.draw(Grafo, pos, ax=eje,
-                with_labels=True,
-                node_color=colores,
-                node_shape='s',
-                node_size=800,
-                font_size=6,
-                edge_color='gray',
-                font_color='#212b6a')
+                with_labels=True,             
+                node_color=colores,           # Pintará cada sala conforme a la lista de colores creada arriba 
+                node_shape='s',               # Forma de los nodos de las salas (square - cuadrado)
+                node_size=800,                # Tamaño de cada sala (son pequeñas porque son muchas)
+                font_size=6,                  # Tamaño de etiquetas de cada sala
+                edge_color='gray',            # Color de los caminos
+                font_color='#212b6a')         # Color del texto de las salas
 
         nx.draw_networkx_edge_labels(Grafo, pos, ax=eje,
                 edge_labels=nx.get_edge_attributes(Grafo, 'weight'),
                 font_size=8)
-
         for widget in cuadrante.winfo_children():
             widget.destroy()
-
         canvas = FigureCanvasTkAgg(figura, master=cuadrante)
         canvas.draw()
         canvas.get_tk_widget().pack(expand=True, fill="both")
@@ -2321,6 +2323,8 @@ Búsqueda de información:
         seguirá funcionando y por lo tanto podremos seguir utilizando el programa
         + lista.copy es una función de las listas que permite hacer una lista completamente nueva que puedas mo-
         dificar sin afectar a la lisra otiginal
+        + Al momento de crear un grafo, with_labels=True significa que cada nodo será creado con todo y su nom-
+        bre
     - Código del profesor y clasroom de la materia:
         + Esqueleto del código
         + Menú
