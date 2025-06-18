@@ -1972,10 +1972,12 @@ class IniciarSesioncomoAdministrador:
         # Funcion
         grafo.mostrarMapa(self.marAcc)
     def mosEst(self):
-        global visitas
-        global salas
-        self.cadSal = " "
-        
+        self.limpiarImagen()
+        texParImp = []
+        for pos, nom in salas.items():
+          texParImp.append(f"Visitas de la sala {nom}: {visitas[pos]}")
+        for i in texParImp:
+          print(i)
     def mostrar_salas(self):
         self.limpiarImagen()
         # Hacer de nuevo el contenedor temporal
@@ -2163,10 +2165,17 @@ class PruebaPersonas:
         # Si hay varios caminos con la misma distancia, elegir el primero de la lista
         camino = caminos[0]
         visitados = []
+        agregarVisitas = set()
         for i in range(len(camino)):
             salaActual = nodos[camino[i]]
             visitados.append(salaActual)
+            if salaActual not in agregarVisitas:
+                for posicion, nombreSala in salas.items():
+                    if nombreSala == salaActual:
+                        visitas[posicion] += 1
+                agregarVisitas.add(salaActual)
             self.colaCamMap.put((cuadrante, visitados.copy()))
+            print(visitas)
             time.sleep(4)
     # Función consumidor: Esta función espera a que la cola que da el productor esté dando elementos nuevos para hacer cambio a los cuadrantes
     def revSiHayMapNue(self):
@@ -2179,8 +2188,6 @@ class PruebaPersonas:
         # Concurrencia: cada 100 milisegundos se revisará de nuevo si la cola está vacía o no para cambiar los mapas
         self.venPru.after(100, self.revSiHayMapNue)
     def mapPer(self, cuadrante, salas_visitadas):
-        global visitas
-        global salas
         Grafo = nx.DiGraph()
         # Crear el Grafo
         for origen, salas1 in grafo.grafo.items():
@@ -2200,11 +2207,7 @@ class PruebaPersonas:
                 colores.append('#62bbcf')     
             else:                             # Todas las demás salas del grafo se pintarán de color gris
                 colores.append('#b7bedb')
-        # Estructura que aumentará en uno cada que pase por ahí una persona con el dfs, de esta manera se lleva a cabo la contabilidad de la estadística
-        for sala1 in salas_visitadas:
-          for posicion, sala2 in salas.items():
-            if sala2 == sala1:
-              visitas[posicion] += 1
+        # Formato de las cosas del grafo
         nx.draw(Grafo, pos, ax=eje,
                 with_labels=True,             
                 node_color=colores,           # Pintará cada sala conforme a la lista de colores creada arriba 
@@ -2213,7 +2216,6 @@ class PruebaPersonas:
                 font_size=6,                  # Tamaño de etiquetas de cada sala
                 edge_color='gray',            # Color de los caminos
                 font_color='#212b6a')         # Color del texto de las salas
-
         nx.draw_networkx_edge_labels(Grafo, pos, ax=eje,
                 edge_labels=nx.get_edge_attributes(Grafo, 'weight'),
                 font_size=8)
