@@ -15,6 +15,7 @@ Fechas de modificación:
         - 18/06/2025 12:25 pm(v3.4: 
 
     Renata:
+        - 18/06/2025 01:01 pm(v3.4: prueba)
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------

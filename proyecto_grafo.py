@@ -408,7 +408,7 @@ def menu()
 class NodoDoble:
     def __init__(self, destino, peso):
         self.destino = destino
-        self.peso = peso
+        self.peso = int(peso)
         self.siguiente = None
         self.anterior = None
 
@@ -1348,7 +1348,7 @@ class IniciarSesioncomoUsuario:
         self.limpiar()
         #-----------MARCO DE ACCION PARA MANIPULAR EL GRAFO----------
 
-        self.marAccUsu = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAccUsu = tk.Frame(self.fondo, bg="#f0f0f0")
         self.marAccUsu.pack(expand=True)
 
         #-----------COSAS DE LA SUBVENTANA MARCOFORMULARIO----------
@@ -1546,7 +1546,7 @@ class IniciarSesioncomoUsuario:
                 messagebox.showinfo('DFS correcto', mostrar)
         else:
             messagebox.showinfo('Sala inexistente', f'¡Una de las salas NO existe!, quizas escribiste mal')
-     
+
 class IniciarSesioncomoAdministrador:
     def __init__(self):
         self.contrasena = '1234'
