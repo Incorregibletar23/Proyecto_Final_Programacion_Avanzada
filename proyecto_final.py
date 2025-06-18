@@ -12,7 +12,7 @@ Fechas de modificación:
         - 17/06/2025 12:38 pm(v3.1: Prueba 1 github)
         - 17/06/2025 12:40 pm(v3.2: Se empezó a trabajar con la concurrencia ya que threads no permite cambios
         en los gráficos en tiempo real)
-        - 18/06/2025 12:25 pm(v3.4: 
+        - 18/06/2025 12:25 pm(v3.4: Se empezó a hacer la función de estadísticas)
 
     Renata:
 '''
@@ -317,6 +317,8 @@ class Grafo:
             messagebox.showinfo('Sala existente', f'La sala {sala} ya existe')
         else:
             self.grafo[sala] = ListaDobleEnlazada()
+            visitas.append(0)
+            salas[len(visitas)] = sala
             messagebox.showinfo('Sala Ingresada', f'La sala {sala} se insertó correctamente')
             self.contador += 1
             # Volver a ejecutar acción agregar sala por sala:
@@ -395,7 +397,7 @@ class Grafo:
         if sala not in self.grafo:
             messagebox.showinfo('Sala inexistente', f'¡La sala {sala} NO existe!, quizas escribiste mal')
             self.contador += 1
-            # Volver a ejecutar acción agregar sala por sala:
+            # Volver a ejecutar acción eliminar sala por sala:
             self.accEliSalSal()
         else:
             del self.grafo[sala]
@@ -1106,6 +1108,21 @@ class IniciarSesioncomoUsuario:
             cursor="hand2",            # Cambia a manita
             command=self.ingdatDFS_
         )
+        self.botonRecomendacion = tk.Button(
+            self.div_izq,
+            text = "Recomendación",
+            font=("Comic Sans MS", 10),
+            bg='#99a3a4',              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#f8f9f9",# Fondo al presionar
+            activeforeground="black",  # Color del texto al presionar
+            padx=10,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.recomendacion
+        )
         self.botonRegresar = tk.Button(
             self.div_izq,
             text='Regresar',
@@ -1121,10 +1138,11 @@ class IniciarSesioncomoUsuario:
             cursor="hand2",            # Cambia a manita
             command=self.regresar
         )
-        self.etiquetaEspacio8.pack(pady=58)
+        self.etiquetaEspacio8.pack(pady=48)
         self.botonLisSal.pack(pady=10)
         self.boton_camino_corto.pack(pady=10)
         self.boton_calcular_camino.pack(pady=10)
+        self.botonRecomendacion.pack(pady=10)
         self.botonRegresar.pack(pady=10)
 
         #-----------COSAS DE LA SUBVENTANA USUARIO(fondo)----------
@@ -1158,6 +1176,18 @@ class IniciarSesioncomoUsuario:
             self.etiquetaAccionUsu.destroy()
         if hasattr(self, 'marAccUsu'):
             self.marAccUsu.destroy()
+    def recomendacion(self):
+        self.limpiar()
+        self.marAccUsu = tk.Frame(self.fondo, bg="#f0f0f0")
+        self.marAccUsu.pack(expand=True)
+        print(self.recomendacionRec(arbolID.raiz))
+    def recomendacionRec(self, actual):
+        if self.idUsuario == actual.dato:
+          return(actual.visitados)
+        elif self.idUsuario < actual.dato:
+          return self.recomendacionRec(actual.izquierda)
+        elif self.idUsuario > actual.dato:
+          return self.recomendacionRec(actual.derecha)
     def lisSalUsu(self):
         self.limpiar()
         self.marAccUsu = tk.Frame(self.fondo, bg="#f0f0f0")
@@ -1298,6 +1328,8 @@ class IniciarSesioncomoUsuario:
             distancia, caminos = buscador.dfs()
             if caminos:
                 caminos_nombre = []
+                camAgarrado = caminos[0]
+                camRec = self.caminoRecursivo(arbolID.raiz, camAgarrado)
                 # Traducir a nombres
                 for camino in caminos:
                     camino_nombres = [nodos[i] for i in camino]
@@ -1305,10 +1337,18 @@ class IniciarSesioncomoUsuario:
             # Texto mostrar
                 mostrar = f"Distancia mas corta: {distancia}, "
                 for i, cam in enumerate(caminos_nombre):
-                    mostrar += f"Camino {i}:{cam}\n"
+                    mostrar += f"Camino {i+1}:{cam}\n"
                     messagebox.showinfo('DFS correcto', mostrar)
         else:
             messagebox.showinfo('Sala inexistente', f'¡Una de las salas NO existe!, quizas escribiste mal')
+    def caminoRecursivo(self, actual, listaCaminos):
+        if self.idUsuario == actual.dato:
+            for i in listaCaminos:
+              actual.visitados[i] += 1
+        elif self.idUsuario < actual.dato:
+            return self.caminoRecursivo(actual.izquierda, listaCaminos)
+        elif self.idUsuario > actual.dato:
+            return self.caminoRecursivo(actual.derecha, listaCaminos)
         
 class IniciarSesioncomoAdministrador:
     def __init__(self):
@@ -2118,6 +2158,14 @@ class PruebaPersonas:
         self.hilos()
         # Función que revisa la cola cada 100 milisegundos
         self.venPru.after(100, self.revSiHayMapNue)
+    def revisarMensajes(self):
+        try:
+            while True:
+                mensaje = self.colaCamMap.get(block=False)
+                messagebox.showinfo("¡Sin Caminos!", mensaje)
+        except queue.Empty:
+          pass
+        self.venPru.after(100, self.revisarMensajes)
     def hilos(self):
         self.hilo1 = tk.Frame(self.venPru, bg='#f0f0f0')
         self.hilo1.grid(row=0, column=0, sticky='nsew')
@@ -2160,7 +2208,7 @@ class PruebaPersonas:
         distancia, caminos = buscar.dfs()
         # Revisa si la lista de caminos tiene algo
         if not caminos:
-            messagebox.showinfo('¡Sin Caminos!', f'No hay camino posible de {origen} a {destino}')
+            self.colaCamMap.put(f"No hay camino posible de {origen} a {destino}")            
             return
         # Si hay varios caminos con la misma distancia, elegir el primero de la lista
         camino = caminos[0]
@@ -2327,6 +2375,9 @@ Búsqueda de información:
         dificar sin afectar a la lisra otiginal
         + Al momento de crear un grafo, with_labels=True significa que cada nodo será creado con todo y su nom-
         bre
+        + No se pueden mostrar mensajes de showinfo desde hilos, no lo permite el sistema, solo se puede hacer
+        eso desde el main, para resolverlo tuvimos que hacer una función nueva que enviara el mensaje desde el
+        main
     - Código del profesor y clasroom de la materia:
         + Esqueleto del código
         + Menú
