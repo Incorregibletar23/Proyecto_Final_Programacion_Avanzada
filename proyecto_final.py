@@ -17,7 +17,7 @@ Fechas de modificación:
     Renata:
         - 18/06/2025 1:22 pm(v3.5: Se empieza a mejorar la parte del arbol y estadisticas para que se muestre en
         la ventana, no en el shell
-        - 18/06/2025 12:25 pm(v3.6: 
+        - 18/06/2025 12:25 pm(v3.6: prueba)
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
