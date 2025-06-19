@@ -2119,6 +2119,8 @@ class PruebaPersonas:
         self.hilos()
         # Función que revisa la cola cada 100 milisegundos
         self.venPru.after(100, self.revSiHayMapNue)
+        # Contador de visitas por sala
+        self.visitas = {i: 0 for i in range(len(salas))}
     def hilos(self):
         self.hilo1 = tk.Frame(self.venPru, bg='#f0f0f0')
         self.hilo1.grid(row=0, column=0, sticky='nsew')
@@ -2173,12 +2175,13 @@ class PruebaPersonas:
             if salaActual not in agregarVisitas:
                 for posicion, nombreSala in salas.items():
                     if nombreSala == salaActual:
-                        visitas[posicion] += 1
+                        self.visitas[posicion] += 1
                 agregarVisitas.add(salaActual)
             self.colaCamMap.put((cuadrante, visitados.copy()))
-            print(visitas)
+            print(self.visitas)
             time.sleep(4)
     # Función consumidor: Esta función espera a que la cola que da el productor esté dando elementos nuevos para hacer cambio a los cuadrantes
+    
     def revSiHayMapNue(self):
         try:
             while True:
@@ -2208,14 +2211,6 @@ class PruebaPersonas:
                 colores.append('#62bbcf')   # azul para camino recorrido
             else:
                 colores.append('#b7bedb')   # gris para no visitados
-            if nodo == salas_visitadas[0]:    # Sala de origen
-                colores.append('#70f475')   
-            elif nodo == salas_visitadas[-1]: # Sala destino
-                colores.append('#ff4d4d')     
-            elif nodo in salas_visitadas:     # Las demás salas que no sean ni origen ni destino
-                colores.append('#62bbcf')     
-            else:                             # Todas las demás salas del grafo se pintarán de color gris
-                colores.append('#b7bedb')
         # Formato de las cosas del grafo
         nx.draw(Grafo, pos, ax=eje,
                 with_labels=True,             
