@@ -2181,7 +2181,6 @@ class PruebaPersonas:
             print(self.visitas)
             time.sleep(4)
     # Función consumidor: Esta función espera a que la cola que da el productor esté dando elementos nuevos para hacer cambio a los cuadrantes
-    
     def revSiHayMapNue(self):
         try:
             while True:
