@@ -12,10 +12,13 @@ Fechas de modificación:
         - 17/06/2025 12:38 pm(v3.1: Prueba 1 github)
         - 17/06/2025 12:40 pm(v3.2: Se empezó a trabajar con la concurrencia ya que threads no permite cambios
         en los gráficos en tiempo real)
-        - 18/06/2025 12:25 pm(v3.4: 
+        - 18/06/2025 12:25 pm(v3.4: Se empezó a hacer la función de estadísticas)
 
     Renata:
         - 18/06/2025 01:01 pm(v3.4: prueba)
+        - 18/06/2025 01:22 pm(v3.5: Se empieza a mejorar la parte del arbol y estadisticas para que se muestre en la ventana, no en el shell)
+        - 18/06/2025 12:25 pm(v3.6: Se empezo a modificar árbol) 
+
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
@@ -318,6 +321,8 @@ class Grafo:
             messagebox.showinfo('Sala existente', f'La sala {sala} ya existe')
         else:
             self.grafo[sala] = ListaDobleEnlazada()
+            visitas.append(0)
+            salas[len(visitas)] = sala
             messagebox.showinfo('Sala Ingresada', f'La sala {sala} se insertó correctamente')
             self.contador += 1
             # Volver a ejecutar acción agregar sala por sala:
@@ -396,7 +401,7 @@ class Grafo:
         if sala not in self.grafo:
             messagebox.showinfo('Sala inexistente', f'¡La sala {sala} NO existe!, quizas escribiste mal')
             self.contador += 1
-            # Volver a ejecutar acción agregar sala por sala:
+            # Volver a ejecutar acción eliminar sala por sala:
             self.accEliSalSal()
         else:
             del self.grafo[sala]
@@ -1107,6 +1112,21 @@ class IniciarSesioncomoUsuario:
             cursor="hand2",            # Cambia a manita
             command=self.ingdatDFS_
         )
+        self.botonRecomendacion = tk.Button(
+            self.div_izq,
+            text = "Recomendación",
+            font=("Comic Sans MS", 10),
+            bg='#99a3a4',              # Fondo
+            fg="black",                # Color del texto
+            activebackground="#f8f9f9",# Fondo al presionar
+            activeforeground="black",  # Color del texto al presionar
+            padx=10,                   # Espacio horizontal interno
+            pady=2,                    # Espacio vertical interno
+            relief="raised",           # Estilo de borde
+            bd=3,                      # Grosor del borde
+            cursor="hand2",            # Cambia a manita
+            command=self.recomendacion
+        )
         self.botonRegresar = tk.Button(
             self.div_izq,
             text='Regresar',
@@ -1122,10 +1142,11 @@ class IniciarSesioncomoUsuario:
             cursor="hand2",            # Cambia a manita
             command=self.regresar
         )
-        self.etiquetaEspacio8.pack(pady=58)
+        self.etiquetaEspacio8.pack(pady=48)
         self.botonLisSal.pack(pady=10)
         self.boton_camino_corto.pack(pady=10)
         self.boton_calcular_camino.pack(pady=10)
+        self.botonRecomendacion.pack(pady=10)
         self.botonRegresar.pack(pady=10)
 
         #-----------COSAS DE LA SUBVENTANA USUARIO(fondo)----------
@@ -1159,6 +1180,18 @@ class IniciarSesioncomoUsuario:
             self.etiquetaAccionUsu.destroy()
         if hasattr(self, 'marAccUsu'):
             self.marAccUsu.destroy()
+    def recomendacion(self):
+        self.limpiar()
+        self.marAccUsu = tk.Frame(self.fondo, bg="#f0f0f0")
+        self.marAccUsu.pack(expand=True)
+        print(self.recomendacionRec(arbolID.raiz))
+    def recomendacionRec(self, actual):
+        if self.idUsuario == actual.dato:
+          return(actual.visitados)
+        elif self.idUsuario < actual.dato:
+          return self.recomendacionRec(actual.izquierda)
+        elif self.idUsuario > actual.dato:
+          return self.recomendacionRec(actual.derecha)
     def lisSalUsu(self):
         self.limpiar()
         self.marAccUsu = tk.Frame(self.fondo, bg="#f0f0f0")
@@ -1299,6 +1332,8 @@ class IniciarSesioncomoUsuario:
             distancia, caminos = buscador.dfs()
             if caminos:
                 caminos_nombre = []
+                camAgarrado = caminos[0]
+                camRec = self.caminoRecursivo(arbolID.raiz, camAgarrado)
                 # Traducir a nombres
                 for camino in caminos:
                     camino_nombres = [nodos[i] for i in camino]
@@ -1306,10 +1341,18 @@ class IniciarSesioncomoUsuario:
             # Texto mostrar
                 mostrar = f"Distancia mas corta: {distancia}, "
                 for i, cam in enumerate(caminos_nombre):
-                    mostrar += f"Camino {i}:{cam}\n"
+                    mostrar += f"Camino {i+1}:{cam}\n"
                     messagebox.showinfo('DFS correcto', mostrar)
         else:
             messagebox.showinfo('Sala inexistente', f'¡Una de las salas NO existe!, quizas escribiste mal')
+    def caminoRecursivo(self, actual, listaCaminos):
+        if self.idUsuario == actual.dato:
+            for i in listaCaminos:
+              actual.visitados[i] += 1
+        elif self.idUsuario < actual.dato:
+            return self.caminoRecursivo(actual.izquierda, listaCaminos)
+        elif self.idUsuario > actual.dato:
+            return self.caminoRecursivo(actual.derecha, listaCaminos)
         
 class IniciarSesioncomoAdministrador:
     def __init__(self):
@@ -1942,15 +1985,15 @@ class IniciarSesioncomoAdministrador:
             relief="raised",           # Estilo de borde
             bd=3,                      # Grosor del borde
             cursor="hand2",            # Cambia a manita
-            command=self.mosMap
+            command=self.mosEst
         )
         # Posiciones
         self.etiquetaMostrar.pack(pady = 10)
         self.botonMosSal.pack(pady = 10)
         self.botonMosLisSal.pack(pady = 10)
         self.botonMosMatAdy.pack(pady = 10)
-        self.botonMosMap.pack()
-        self.botonEstadi.pack()
+        self.botonMosMap.pack(pady = 10)
+        self.botonEstadi.pack(pady = 10)
     def mostrarSal(self):
         self.limpiarImagen()
         # Hacer de nuevo el contenedor temporal
@@ -1972,6 +2015,35 @@ class IniciarSesioncomoAdministrador:
         self.marAcc.pack(expand=True)
         # Funcion
         grafo.mostrarMapa(self.marAcc)
+    def mosEst(self):
+        self.limpiarImagen()
+        # Hacer de nuevo el contenedor temporal
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+        # Funcion
+        texParImp = []
+        texto = ''
+        for pos, nom in salas.items():
+          texParImp.append(f"Visitas de la sala {nom}: {visitas[pos]}\n")
+        maximo = max(visitas)
+        print(maximo)
+        
+            
+        for sala in texParImp:
+          texto += str(sala)
+          texto += '\n'
+        self.texmosven = tk.Text(self.marAcc,                    # En donde se coloca el contenedor
+                                     width=160,                  # Ancho de la etiqueta
+                                     height=30,                  # Define cuantas líneas de texto se pueden mostrar
+                                     font=("Century Gothic", 10),# Fuente, tamaño y estilo
+                                     fg="black",                 # Color del texto
+                                     bg="#f0f0f0"                # Color de fondo de la etiqueta
+                                     )
+        self.texmosven.pack(fill="both", expand=True, pady=10)
+        self.texmosven.insert(tk.END, texto)
+        self.texmosven.config(state="disabled")
+        
+                                 
     def mostrar_salas(self):
         self.limpiarImagen()
         # Hacer de nuevo el contenedor temporal
@@ -2112,6 +2184,15 @@ class PruebaPersonas:
         self.hilos()
         # Función que revisa la cola cada 100 milisegundos
         self.venPru.after(100, self.revSiHayMapNue)
+        self.visitas = {i: 0 for i in range(len(salas))}
+    def revisarMensajes(self):
+        try:
+            while True:
+                mensaje = self.colaCamMap.get(block=False)
+                messagebox.showinfo("¡Sin Caminos!", mensaje)
+        except queue.Empty:
+          pass
+        self.venPru.after(100, self.revisarMensajes)
     def hilos(self):
         self.hilo1 = tk.Frame(self.venPru, bg='#f0f0f0')
         self.hilo1.grid(row=0, column=0, sticky='nsew')
@@ -2154,16 +2235,22 @@ class PruebaPersonas:
         distancia, caminos = buscar.dfs()
         # Revisa si la lista de caminos tiene algo
         if not caminos:
-            messagebox.showinfo('¡Sin Caminos!', f'No hay camino posible de {origen} a {destino}')
+            self.colaCamMap.put(f"No hay camino posible de {origen} a {destino}")            
             return
         # Si hay varios caminos con la misma distancia, elegir el primero de la lista
         camino = caminos[0]
         visitados = []
+        agregarVisitas = set()
         for i in range(len(camino)):
             salaActual = nodos[camino[i]]
             visitados.append(salaActual)
+            if salaActual not in agregarVisitas:
+                for posicion, nombreSala in salas.items():
+                    if nombreSala == salaActual:
+                        visitas[posicion] += 1
+                agregarVisitas.add(salaActual)
             self.colaCamMap.put((cuadrante, visitados.copy()))
-            time.sleep(4)
+            time.sleep(.1)
     # Función consumidor: Esta función espera a que la cola que da el productor esté dando elementos nuevos para hacer cambio a los cuadrantes
     def revSiHayMapNue(self):
         try:
@@ -2175,8 +2262,6 @@ class PruebaPersonas:
         # Concurrencia: cada 100 milisegundos se revisará de nuevo si la cola está vacía o no para cambiar los mapas
         self.venPru.after(100, self.revSiHayMapNue)
     def mapPer(self, cuadrante, salas_visitadas):
-        global visitas
-        global salas
         Grafo = nx.DiGraph()
         # Crear el Grafo
         for origen, salas1 in grafo.grafo.items():
@@ -2185,39 +2270,31 @@ class PruebaPersonas:
         figura = plt.Figure()
         eje = figura.add_subplot(1, 1, 1)
         pos = nx.spring_layout(Grafo)
-
+        # Hacer una lista que tenga en orden los colores que va a llevar cada nodo en el grafo
         colores = []
         for nodo in Grafo.nodes:
-            if nodo == salas_visitadas[0]:  # nodo origen
-                colores.append('#70f475')   # naranja rojizo
-            elif nodo == salas_visitadas[-1]:  # nodo destino
-                colores.append('#ff4d4d')   # rojo más intenso
-            elif nodo in salas_visitadas:
-                colores.append('#62bbcf')   # azul para camino recorrido
-            else:
-                colores.append('#b7bedb')   # gris para no visitados
-        for sala1 in salas_visitadas:
-          for posicion, sala2 in salas.items():
-            if sala2 == sala1:
-              visitas[posicion] += 1
-        print(salas)
-        print(visitas)
+            if nodo == salas_visitadas[0]:    # Sala de origen
+                colores.append('#70f475')   
+            elif nodo == salas_visitadas[-1]: # Sala destino
+                colores.append('#ff4d4d')     
+            elif nodo in salas_visitadas:     # Las demás salas que no sean ni origen ni destino
+                colores.append('#62bbcf')     
+            else:                             # Todas las demás salas del grafo se pintarán de color gris
+                colores.append('#b7bedb')
+        # Formato de las cosas del grafo
         nx.draw(Grafo, pos, ax=eje,
-                with_labels=True,
-                node_color=colores,
-                node_shape='s',
-                node_size=800,
-                font_size=6,
-                edge_color='gray',
-                font_color='#212b6a')
-
+                with_labels=True,             
+                node_color=colores,           # Pintará cada sala conforme a la lista de colores creada arriba 
+                node_shape='s',               # Forma de los nodos de las salas (square - cuadrado)
+                node_size=800,                # Tamaño de cada sala (son pequeñas porque son muchas)
+                font_size=6,                  # Tamaño de etiquetas de cada sala
+                edge_color='gray',            # Color de los caminos
+                font_color='#212b6a')         # Color del texto de las salas
         nx.draw_networkx_edge_labels(Grafo, pos, ax=eje,
                 edge_labels=nx.get_edge_attributes(Grafo, 'weight'),
                 font_size=8)
-
         for widget in cuadrante.winfo_children():
             widget.destroy()
-
         canvas = FigureCanvasTkAgg(figura, master=cuadrante)
         canvas.draw()
         canvas.get_tk_widget().pack(expand=True, fill="both")
@@ -2322,6 +2399,11 @@ Búsqueda de información:
         seguirá funcionando y por lo tanto podremos seguir utilizando el programa
         + lista.copy es una función de las listas que permite hacer una lista completamente nueva que puedas mo-
         dificar sin afectar a la lisra otiginal
+        + Al momento de crear un grafo, with_labels=True significa que cada nodo será creado con todo y su nom-
+        bre
+        + No se pueden mostrar mensajes de showinfo desde hilos, no lo permite el sistema, solo se puede hacer
+        eso desde el main, para resolverlo tuvimos que hacer una función nueva que enviara el mensaje desde el
+        main
     - Código del profesor y clasroom de la materia:
         + Esqueleto del código
         + Menú
