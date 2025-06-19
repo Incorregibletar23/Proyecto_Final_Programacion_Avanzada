@@ -15,6 +15,9 @@ Fechas de modificación:
         - 18/06/2025 12:25 pm(v3.4: Se empezó a hacer la función de estadísticas)
 
     Renata:
+        - 18/06/2025 1:22 pm(v3.5: Se empieza a mejorar la parte del arbol y estadisticas para que se muestre en
+        la ventana, no en el shell
+        - 18/06/2025 12:25 pm(v3.6: 
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
@@ -2013,11 +2016,33 @@ class IniciarSesioncomoAdministrador:
         grafo.mostrarMapa(self.marAcc)
     def mosEst(self):
         self.limpiarImagen()
+        # Hacer de nuevo el contenedor temporal
+        self.marAcc = tk.Frame(self.imagen, bg="#f0f0f0")
+        self.marAcc.pack(expand=True)
+        # Funcion
         texParImp = []
+        texto = ''
         for pos, nom in salas.items():
-          texParImp.append(f"Visitas de la sala {nom}: {visitas[pos]}")
-        for i in texParImp:
-          print(i)
+          texParImp.append(f"Visitas de la sala {nom}: {visitas[pos]}\n")
+        maximo = max(visitas)
+        print(maximo)
+        
+            
+        for sala in texParImp:
+          texto += str(sala)
+          texto += '\n'
+        self.texmosven = tk.Text(self.marAcc,                    # En donde se coloca el contenedor
+                                     width=160,                  # Ancho de la etiqueta
+                                     height=30,                  # Define cuantas líneas de texto se pueden mostrar
+                                     font=("Century Gothic", 10),# Fuente, tamaño y estilo
+                                     fg="black",                 # Color del texto
+                                     bg="#f0f0f0"                # Color de fondo de la etiqueta
+                                     )
+        self.texmosven.pack(fill="both", expand=True, pady=10)
+        self.texmosven.insert(tk.END, texto)
+        self.texmosven.config(state="disabled")
+        
+                                 
     def mostrar_salas(self):
         self.limpiarImagen()
         # Hacer de nuevo el contenedor temporal
@@ -2158,6 +2183,7 @@ class PruebaPersonas:
         self.hilos()
         # Función que revisa la cola cada 100 milisegundos
         self.venPru.after(100, self.revSiHayMapNue)
+        self.visitas = {i: 0 for i in range(len(salas))}
     def revisarMensajes(self):
         try:
             while True:
@@ -2223,8 +2249,7 @@ class PruebaPersonas:
                         visitas[posicion] += 1
                 agregarVisitas.add(salaActual)
             self.colaCamMap.put((cuadrante, visitados.copy()))
-            print(visitas)
-            time.sleep(4)
+            time.sleep(.1)
     # Función consumidor: Esta función espera a que la cola que da el productor esté dando elementos nuevos para hacer cambio a los cuadrantes
     def revSiHayMapNue(self):
         try:
