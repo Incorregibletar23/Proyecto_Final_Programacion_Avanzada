@@ -15,9 +15,11 @@ Fechas de modificación:
         - 18/06/2025 12:25 pm(v3.4: Se empezó a hacer la función de estadísticas)
 
     Renata:
-        - 18/06/2025 1:22 pm(v3.5: Se empieza a mejorar la parte del arbol y estadisticas para que se muestre en
-        la ventana, no en el shell
-        - 18/06/2025 12:25 pm(v3.6: prueba)
+        - 18/06/2025 01:01 pm(v3.4: prueba)
+        - 18/06/2025 01:22 pm(v3.5: Se empieza a mejorar la parte del arbol y estadisticas para que se muestre en la ventana, no en el shell)
+        - 18/06/2025 12:25 pm(v3.6: Se empezo a modificar árbol) 
+
+
 '''
 
 # 2.- ---------- Importación de módulos y bibliotecas ----------
@@ -112,9 +114,7 @@ class ABB:
     print()
   def postorden_recursivo(self, nodo_actual):
     if nodo_actual is not None:
-
       self.postorden_recursivo(nodo_actual.izquierda)
-
       self.postorden_recursivo(nodo_actual.derecha)
       print(nodo_actual.dato, end=' ')
   def eliminar(self, dato):
@@ -1171,7 +1171,6 @@ class IniciarSesioncomoUsuario:
         self.etiquetaEspacio9.pack(pady = 90)
         self.etiquetaBienUsu.pack(pady = 10)
         self.etiquetaAccionUsu.pack(pady = 8)
-        
     def limpiar(self):
         if hasattr(self, 'etiquetaEspacio9'):
             self.etiquetaEspacio9.destroy()
@@ -1181,10 +1180,37 @@ class IniciarSesioncomoUsuario:
             self.marAccUsu.destroy()
     def recomendacion(self):
         self.limpiar()
+        # Crear marco temporal 
         self.marAccUsu = tk.Frame(self.fondo, bg="#f0f0f0")
         self.marAccUsu.pack(expand=True)
+        # Crear texto
+        texParImp = []
+        texto = ""
+        visitadas = self.recomendacionRec(arbolID.raiz)
+        for pos, nom in salas.items():
+          texParImp.append(f"Visitas de la sala {nom}: {visitadas[pos]}\n")
+        maximo = max(visitadas)
+        salmasvis = [salas[i] for i, v in enumerate(visitadas) if v == maximo]
+        vist = set(salmasvis)
+        for sala in texParImp:
+          texto += str(sala)
+          texto += '\n'
+        texto += "\nLas salas que mas visitas :\n" + "\n".join(vist)
+
+        self.texmosven = tk.Text(self.marAccUsu,                    # En donde se coloca el contenedor
+                                     width=160,                  # Ancho de la etiqueta
+                                     height=30,                  # Define cuantas líneas de texto se pueden mostrar
+                                     font=("Century Gothic", 10),# Fuente, tamaño y estilo
+                                     fg="black",                 # Color del texto
+                                     bg="#f0f0f0"                # Color de fondo de la etiqueta
+                                     )
+        self.texmosven.pack(fill="both", expand=True, pady=10)
+        self.texmosven.insert(tk.END, texto)
+        self.texmosven.config(state="disabled")
+
         print(self.recomendacionRec(arbolID.raiz))
     def recomendacionRec(self, actual):
+        
         if self.idUsuario == actual.dato:
           return(actual.visitados)
         elif self.idUsuario < actual.dato:
@@ -1206,7 +1232,6 @@ class IniciarSesioncomoUsuario:
     def regresar(self):
         self.ventUs.destroy()
         VentanaPrincipal()
-        
     def divisiones_colores_ventUs(self):
         # #717d7e
         self.color_arriba = tk.Frame(self.ventUs, bg='#2c3e50', width=800, height=40)
@@ -1229,9 +1254,7 @@ class IniciarSesioncomoUsuario:
         self.color_fondo= tk.Frame(self.ventUs, bg='#f4f6f7', width=800)
         self.color_fondo.pack(side='top', fill='both', expand = True)
         self.division_izquierda()
-
     def division_izquierda(self):
-        
         self.div_izq = tk.Frame(self.color_fondo, bg='#ccd1d1', width=180, height=560)
         self.div_izq.pack(side='left', fill='y', anchor = 'nw')
         self.div_izq.pack_propagate(False)
@@ -1352,6 +1375,7 @@ class IniciarSesioncomoUsuario:
             return self.caminoRecursivo(actual.izquierda, listaCaminos)
         elif self.idUsuario > actual.dato:
             return self.caminoRecursivo(actual.derecha, listaCaminos)
+        
         
 class IniciarSesioncomoAdministrador:
     def __init__(self):
@@ -2026,8 +2050,6 @@ class IniciarSesioncomoAdministrador:
           texParImp.append(f"Visitas de la sala {nom}: {visitas[pos]}\n")
         maximo = max(visitas)
         print(maximo)
-        
-            
         for sala in texParImp:
           texto += str(sala)
           texto += '\n'
@@ -2041,7 +2063,6 @@ class IniciarSesioncomoAdministrador:
         self.texmosven.pack(fill="both", expand=True, pady=10)
         self.texmosven.insert(tk.END, texto)
         self.texmosven.config(state="disabled")
-        
                                  
     def mostrar_salas(self):
         self.limpiarImagen()
@@ -2249,7 +2270,7 @@ class PruebaPersonas:
                         visitas[posicion] += 1
                 agregarVisitas.add(salaActual)
             self.colaCamMap.put((cuadrante, visitados.copy()))
-            time.sleep(.1)
+            time.sleep(3)
     # Función consumidor: Esta función espera a que la cola que da el productor esté dando elementos nuevos para hacer cambio a los cuadrantes
     def revSiHayMapNue(self):
         try:
