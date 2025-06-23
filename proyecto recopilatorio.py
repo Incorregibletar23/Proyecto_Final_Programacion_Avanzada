@@ -189,7 +189,7 @@ class MenuEduardo:
                 nueva_ventana.title(nombre)
                 nueva_ventana.geometry("400x300")
                 nueva_ventana.iconbitmap('iconopythonchico.ico')
-                text = "URL del canva:\n \nhttps://www.canva.com/design/DAGq1AvEGzU/NFeT-2fxMIGX4L5MPhnDFw/edit?utm_content=DAGq1AvEGzU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton\nVideo:\n\nhttps://drive.google.com/file/d/1uwnV77hsIA6vj49XcKbSwEYFj8M9mxR7/view?usp=sharing"
+                text = "URL del canva:\n \nhttps://www.canva.com/design/DAGq1AvEGzU/NFeT-2fxMIGX4L5MPhnDFw/edit?utm_content=DAGq1AvEGzU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton\nVideo:\n\nhttps://drive.google.com/file/d/1uwnV77hsIA6vj49XcKbSwEYFj8M9mxR7/view?usp=sharing \n \n Esp32: \n\nhttps://wokwi.com/projects/434491088861818881"
                 texto = tk.Text(nueva_ventana,# En donde se coloca el contenedor
                     width=160,                  # Ancho de la etiqueta
                     height=30,                  # Define cuantas líneas de texto se pueden mostrar
@@ -698,7 +698,7 @@ class MenuRenata:
                 nueva_ventana.title(nombre)
                 nueva_ventana.geometry("400x300")
                 nueva_ventana.iconbitmap('iconopythonchico.ico')
-                text = "URL del canva:\n \nhttps://www.canva.com/design/DAGq1AvEGzU/NFeT-2fxMIGX4L5MPhnDFw/edit?utm_content=DAGq1AvEGzU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton\nVideo:\n\nhttps://drive.google.com/file/d/1uwnV77hsIA6vj49XcKbSwEYFj8M9mxR7/view?usp=sharing"
+                text = "URL del canva:\n \nhttps://www.canva.com/design/DAGq1AvEGzU/NFeT-2fxMIGX4L5MPhnDFw/edit?utm_content=DAGq1AvEGzU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton\nVideo:\n\nhttps://drive.google.com/file/d/1uwnV77hsIA6vj49XcKbSwEYFj8M9mxR7/view?usp=sharing \n \n Esp32: \n\nhttps://wokwi.com/projects/434491088861818881"
                 texto = tk.Text(nueva_ventana,# En donde se coloca el contenedor
                     width=160,                  # Ancho de la etiqueta
                     height=30,                  # Define cuantas líneas de texto se pueden mostrar
